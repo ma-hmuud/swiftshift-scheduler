@@ -45,11 +45,12 @@ export const createShiftDb = async (shift: ShiftInput) => {
 export const updateShiftDb = async (
   shiftId: number,
   shift: UpdateShiftInput,
+  managerId: number,
 ) => {
   return db
     .update(shifts)
     .set(shift)
-    .where(eq(shifts.id, shiftId))
+    .where(and(eq(shifts.id, shiftId), eq(shifts.managerId, managerId)))
     .returning({
       id: shifts.id,
     })

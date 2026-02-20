@@ -3,7 +3,6 @@ import {
   createShiftDb,
   deleteShiftDb,
   getAllShiftsDb,
-  getOneShiftDb,
   updateShiftDb,
 } from "../repositories/shifts";
 import { managerProcedure } from "./manager";
@@ -75,31 +74,21 @@ export const shiftsUpdateProc = managerProcedure
         message: "Shift ID must be exist",
       });
 
-    const { data: oldShift, error: oldShiftError } = await tryCatch(
-      getOneShiftDb(shiftId, Number(managerId)),
-    );
-
-    if (oldShiftError) {
-      console.error("Error get shift:", oldShiftError.message);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get shift",
-      });
-    }
-    if (!oldShift)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Shift not found",
-      });
-
     const { data: updatedShift, error: updatedShiftError } = await tryCatch(
-      updateShiftDb(shiftId, newShift),
+      updateShiftDb(shiftId, newShift, Number(managerId)),
     );
-    if (updatedShiftError && !updatedShift) {
+    if (updatedShiftError) {
       console.error("Error updating shift:", updatedShiftError.message);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to update shift",
+      });
+    }
+
+    if (!updatedShift) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Shift not found or you don't have permission to update it",
       });
     }
 
