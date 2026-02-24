@@ -21,7 +21,7 @@ export const getAllShiftsDb = async () => {
     .innerJoin(user, eq(shifts.managerId, user.id));
 };
 
-export const getOneShiftDb = async (shiftId: number, managerId: number) => {
+export const getManagerShiftDb = async (shiftId: number, managerId: number) => {
   return db
     .select({
       id: shifts.id,
@@ -30,6 +30,19 @@ export const getOneShiftDb = async (shiftId: number, managerId: number) => {
     })
     .from(shifts)
     .where(and(eq(shifts.id, shiftId), eq(shifts.managerId, managerId)));
+};
+
+export const getOneShiftDb = async (shiftId: number) => {
+  return db
+    .select({
+      id: shifts.id,
+      startTime: shifts.startTime,
+      endTime: shifts.endTime,
+      status: shifts.status,
+    })
+    .from(shifts)
+    .where(and(eq(shifts.id, shiftId), eq(shifts.status, "published")))
+    .then((res) => res[0]);
 };
 
 export const createShiftDb = async (shift: ShiftInput) => {
