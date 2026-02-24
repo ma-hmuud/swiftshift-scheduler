@@ -10,6 +10,8 @@ import { TRPCError } from "@trpc/server";
 import { createShiftSchema, updateShiftSchema } from "~/lib/schemas/shifts";
 import { getManagerByIdDb } from "../repositories/manager";
 import z from "zod";
+import { protectedProcedure } from "../trpc";
+import { getAvailabilityDb } from "../repositories/availability";
 
 export const shiftsGetAllProc = managerProcedure.query(async () => {
   const { data: shiftsDb, error: shiftsError } =
@@ -124,3 +126,53 @@ export const shiftsDeleteProc = managerProcedure
 
     return { ok: true, data: deletedShift };
   });
+
+export const shiftsGetPublishedProc = protectedProcedure.query(
+  async ({ ctx }) => {
+    const { id: employeeId } = ctx.session.user;
+
+    const { data, error } = await tryCatch(
+      Promise.all([getAvailabilityDb(Number(employeeId)), getAllShiftsDb()]),
+    );
+    if (error) {
+      console.error(
+        "Error fetching employee availability or shifts: ",
+        error.message,
+      );
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch employee availability or shifts",
+      });
+    }
+
+    const [availability, shifts] = data;
+
+    if (!availability) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message:
+          "Employee availability not found. Please set your availability before sending shift requests.",
+      });
+    }
+    if (!shifts) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Shifts not found",
+      });
+    }
+
+    // Filter shifts to only include those that are published and match the employee's availability
+    const publishedShifts = shifts.filter((shift) => {
+      const shiftStartDay = new Date(shift.startTime).getUTCDay();
+      const shiftEndDay = new Date(shift.endTime).getUTCDay();
+      const { daysOfWeek } = availability as {
+        daysOfWeek: Record<number, boolean>;
+      };
+
+      const isAvailable = daysOfWeek[shiftStartDay] && daysOfWeek[shiftEndDay];
+      return shift.status === "published" && isAvailable;
+    });
+
+    return { ok: true, data: publishedShifts };
+  },
+);
