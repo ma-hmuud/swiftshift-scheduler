@@ -19,3 +19,8 @@ export const shiftsRouter = createTRPCRouter({
   // delete proc
   delete: shiftsDeleteProc,
 });
+
+export const shiftsEmployeeRouter = createTRPCRouter({
+  // get proc
+  list: shiftsGetAllProc,
+});
