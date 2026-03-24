@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { authClient } from "~/server/better-auth/client";
 import { getSession } from "~/server/better-auth/server";
+import { LoginButton } from "~/app/_components/login-button";
 
 export default async function LoginPage() {
   const session = await getSession();
@@ -24,26 +24,7 @@ export default async function LoginPage() {
         </p>
 
         <div className="swift-hero-actions">
-          <form>
-            <button
-              className="swift-button"
-              formAction={async () => {
-                "use server";
-                const { data, error } = await authClient.signIn.social({
-                  provider: "google",
-                });
-
-                if (!data) {
-                  console.error(error?.message);
-                  throw new Error(error?.message);
-                }
-
-                redirect(data.url!);
-              }}
-            >
-              Continue with Google
-            </button>
-          </form>
+          <LoginButton />
 
           <Link href="/" className="swift-link">
             Back to home
