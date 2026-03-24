@@ -1,9 +1,12 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { Cormorant_Garamond, Manrope, Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { cn } from "~/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Swift Shift - Employee Scheduler",
@@ -39,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable}`}
+      className={cn(display.variable, body.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
       <body>
