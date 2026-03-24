@@ -1,6 +1,617 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: var(--font-body), "Segoe UI", sans-serif;
+}
+
+:root {
+  --bg: #f4efe8;
+  --bg-panel: rgba(255, 255, 255, 0.78);
+  --ink: #111111;
+  --ink-soft: #4a4a47;
+  --line: rgba(16, 16, 16, 0.16);
+  --accent: #0f6f63;
+  --accent-soft: #d7f2eb;
+  --hero-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+}
+
+.dark {
+  --bg: #121210;
+  --bg-panel: rgba(28, 28, 24, 0.78);
+  --ink: #f6f4ef;
+  --ink-soft: #c7c2b8;
+  --line: rgba(255, 255, 255, 0.2);
+  --accent: #7ee9d8;
+  --accent-soft: rgba(126, 233, 216, 0.14);
+  --hero-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+}
+
+.swift-shell {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  padding: 1.2rem 1rem 2.5rem;
+}
+
+.swift-mesh {
+  pointer-events: none;
+  position: absolute;
+  inset: -18%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(15, 111, 99, 0.23), transparent 42%),
+    radial-gradient(
+      circle at 84% 28%,
+      rgba(237, 174, 73, 0.26),
+      transparent 36%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 48%);
+  animation: meshDrift 16s ease-in-out infinite alternate;
+}
+
+.swift-nav {
+  margin: 0 auto 1.8rem;
+  display: flex;
+  width: min(1120px, 100%);
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  padding: 0.65rem 1rem;
+  backdrop-filter: blur(12px);
+  transition: border-color 220ms ease;
+}
+
+.swift-brand {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.03em;
+}
+
+.swift-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-switch {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.3rem 0.45rem;
+  cursor: pointer;
+  transition: transform 180ms ease;
+}
+
+.theme-switch:hover {
+  transform: translateY(-1px);
+}
+
+.theme-switch-track {
+  display: inline-flex;
+  width: 2.7rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  padding: 0.18rem;
+}
+
+.theme-switch-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  transform: translateX(0);
+  transition: transform 220ms ease;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.theme-switch-thumb.is-dark {
+  transform: translateX(1.22rem);
+}
+
+.theme-switch-text {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.swift-link,
+.swift-quiet-button {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition:
+    color 220ms ease,
+    letter-spacing 220ms ease;
+}
+
+.swift-link:hover,
+.swift-quiet-button:hover {
+  color: var(--accent);
+  letter-spacing: 0.06em;
+}
+
+.swift-hero {
+  margin: 0 auto;
+  width: min(1120px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: var(--bg-panel);
+  padding: clamp(1.4rem, 4vw, 3.2rem);
+  box-shadow: var(--hero-shadow);
+  animation: rise 700ms ease;
+}
+
+.swift-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.swift-hero h1,
+.swift-features h2,
+.swift-usecases h2 {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.4rem, 9vw, 6rem);
+  line-height: 0.95;
+}
+
+.swift-hero-copy {
+  margin-top: 1rem;
+  max-width: 48ch;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 2.7vw, 1.25rem);
+  line-height: 1.6;
+}
+
+.swift-hero-actions {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.swift-button {
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  padding: 0.78rem 1.7rem;
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.swift-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.swift-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 38%,
+    transparent 74%
+  );
+  transform: translateX(-120%);
+}
+
+.swift-button:hover::after {
+  animation: ctaShine 620ms ease;
+}
+
+.swift-hero-strip {
+  margin-top: 1.8rem;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.42rem 0.95rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-soft);
+  animation: pulseStrip 2.8s ease-in-out infinite;
+}
+
+.is-divider {
+  color: var(--accent);
+}
+
+.swift-comparison,
+.swift-features,
+.swift-usecases,
+.swift-footer,
+.swift-metrics {
+  margin: 1.6rem auto 0;
+  width: min(1120px, 100%);
+}
+
+.swift-comparison {
+  display: grid;
+  gap: 1rem;
+}
+
+.swift-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--bg-panel);
+  padding: 1.25rem;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease;
+}
+
+.swift-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.swift-card h2 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.8rem;
+}
+
+.swift-card ul {
+  margin: 0.9rem 0 0;
+  display: grid;
+  gap: 0.6rem;
+  color: var(--ink-soft);
+  padding-left: 1.1rem;
+}
+
+.swift-metrics {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.swift-metrics p {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg-panel);
+  padding: 0.9rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  transition:
+    transform 220ms ease,
+    background-color 220ms ease;
+}
+
+.swift-metrics p:hover {
+  transform: translateY(-3px);
+  background: color-mix(in srgb, var(--bg-panel) 72%, var(--accent-soft));
+}
+
+.swift-metrics strong {
+  color: var(--ink);
+  margin-right: 0.35rem;
+}
+
+.swift-features h2,
+.swift-usecases h2 {
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  margin-top: 0.3rem;
+}
+
+.feature-tabs {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--bg-panel);
+  padding: 0.95rem;
+}
+
+.feature-tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.feature-tab {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 0.42rem 0.84rem;
+  cursor: pointer;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+.feature-tab:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.feature-tab.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.feature-tab-panel {
+  margin-top: 0.85rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.95rem;
+  animation: fadeSlide 320ms ease;
+}
+
+.feature-tab-panel h3 {
+  margin: 0;
+  font-size: 1.32rem;
+}
+
+.feature-tab-panel p {
+  margin: 0.55rem 0 0;
+  max-width: 56ch;
+  color: var(--ink-soft);
+}
+
+.feature-tab-panel ul {
+  margin: 0.8rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.swift-usecase-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.swift-usecase-grid article {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg-panel);
+  padding: 0.95rem;
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+.swift-usecase-grid article:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+
+.swift-usecase-grid h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.swift-usecase-grid p {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+}
+
+.swift-footer {
+  margin-top: 2.2rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.swift-footer p {
+  margin: 0;
+}
+
+.swift-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  transition: opacity 180ms ease;
+}
+
+.swift-footer a:hover {
+  opacity: 0.74;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: staggerIn 680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-1 {
+  animation-delay: 80ms;
+}
+
+.reveal-2 {
+  animation-delay: 150ms;
+}
+
+.reveal-3 {
+  animation-delay: 230ms;
+}
+
+.reveal-4 {
+  animation-delay: 280ms;
+}
+
+.reveal-5 {
+  animation-delay: 340ms;
+}
+
+.reveal-6 {
+  animation-delay: 420ms;
+}
+
+.reveal-7 {
+  animation-delay: 500ms;
+}
+
+.reveal-8 {
+  animation-delay: 580ms;
+}
+
+.reveal-9 {
+  animation-delay: 620ms;
+}
+
+.reveal-10 {
+  animation-delay: 670ms;
+}
+
+.reveal-11 {
+  animation-delay: 720ms;
+}
+
+.reveal-12 {
+  animation-delay: 770ms;
+}
+
+.reveal-13 {
+  animation-delay: 840ms;
+}
+
+@media (min-width: 800px) {
+  .swift-shell {
+    padding: 1.8rem 2rem 3.4rem;
+  }
+
+  .swift-comparison {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .swift-usecase-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .swift-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes meshDrift {
+  from {
+    transform: translate3d(-1.2%, 0.7%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1%, -1.1%, 0) scale(1.04);
+  }
+}
+
+@keyframes ctaShine {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes pulseStrip {
+  0%,
+  100% {
+    border-color: var(--line);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--accent) 68%, var(--line));
+  }
 }
