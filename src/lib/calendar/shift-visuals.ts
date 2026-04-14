@@ -1,13 +1,13 @@
-/** FullCalendar event colors — hex for broad browser support inside FC. */
+/** FullCalendar event colors — aligned with brand olive / sage / sand palette. */
 
 export function managerCapacityColors(booked: number, capacity: number) {
   if (booked >= capacity) {
-    return { backgroundColor: "#dc2626", borderColor: "#b91c1c" };
+    return { backgroundColor: "#b35252", borderColor: "#8f3d3d" };
   }
   if (booked === 0) {
-    return { backgroundColor: "#16a34a", borderColor: "#15803d" };
+    return { backgroundColor: "#99ad7a", borderColor: "#546b41" };
   }
-  return { backgroundColor: "#ca8a04", borderColor: "#a16207" };
+  return { backgroundColor: "#b89a5c", borderColor: "#8a7344" };
 }
 
 export function employeeShiftColors(args: {
@@ -18,13 +18,13 @@ export function employeeShiftColors(args: {
   const { booked, capacity, myRequestStatus } = args;
 
   if (myRequestStatus === "approved") {
-    return { backgroundColor: "#7c3aed", borderColor: "#6d28d9" };
+    return { backgroundColor: "#8b7eae", borderColor: "#6b5d85" };
   }
   if (myRequestStatus === "pending") {
-    return { backgroundColor: "#2563eb", borderColor: "#1d4ed8" };
+    return { backgroundColor: "#6b8cae", borderColor: "#4f6d86" };
   }
   if (booked >= capacity) {
-    return { backgroundColor: "#737373", borderColor: "#525252" };
+    return { backgroundColor: "#5a5d56", borderColor: "#3d4038" };
   }
-  return { backgroundColor: "#16a34a", borderColor: "#15803d" };
+  return { backgroundColor: "#99ad7a", borderColor: "#546b41" };
 }

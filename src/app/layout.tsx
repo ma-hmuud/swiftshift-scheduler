@@ -26,13 +26,10 @@ const body = Manrope({
   variable: "--font-body",
 });
 
-const themeInitScript = `
+const darkOnlyScript = `
 (() => {
-  const storageKey = "swift-shift-theme";
-  const savedTheme = localStorage.getItem(storageKey);
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const theme = savedTheme ?? (prefersDark ? "dark" : "light");
-  document.documentElement.classList.toggle("dark", theme === "dark");
+  document.documentElement.classList.add("dark");
+  document.documentElement.style.colorScheme = "dark";
 })();
 `;
 
@@ -42,11 +39,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(display.variable, body.variable, "font-sans", geist.variable)}
+      className={cn(
+        display.variable,
+        body.variable,
+        "font-sans",
+        geist.variable,
+        "dark",
+      )}
       suppressHydrationWarning
     >
-      <body>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <script dangerouslySetInnerHTML={{ __html: darkOnlyScript }} />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

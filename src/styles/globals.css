@@ -8,95 +8,57 @@
   --font-sans: var(--font-body), "Segoe UI", sans-serif;
 }
 
+/* Dark-only theme — olive & cream palette */
 :root {
-  --bg: #f4efe8;
-  --bg-panel: rgba(255, 255, 255, 0.78);
-  --ink: #111111;
-  --ink-soft: #4a4a47;
-  --line: rgba(16, 16, 16, 0.16);
-  --accent: #0f6f63;
-  --accent-soft: #d7f2eb;
-  --hero-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
-  --background: #f4efe8;
-  --foreground: #111111;
-  --card: rgba(255, 255, 255, 0.78);
-  --card-foreground: #111111;
-  --popover: #ffffff;
-  --popover-foreground: #111111;
-  --primary: #111111;
-  --primary-foreground: #f4efe8;
-  --secondary: #e8e4dc;
-  --secondary-foreground: #111111;
-  --muted: #e8e4dc;
-  --muted-foreground: #4a4a47;
-  --accent-foreground: #f4efe8;
-  --destructive: #dc2626;
-  --border: rgba(16, 16, 16, 0.16);
-  --input: rgba(16, 16, 16, 0.12);
-  --ring: #0f6f63;
-  --radius: 0.625rem;
-  --sidebar: #f4efe8;
-  --sidebar-foreground: #111111;
-  --sidebar-primary: #0f6f63;
-  --sidebar-primary-foreground: #f4efe8;
-  --sidebar-accent: #e8e4dc;
-  --sidebar-accent-foreground: #111111;
-  --sidebar-border: rgba(16, 16, 16, 0.16);
-  --sidebar-ring: #0f6f63;
-  /* App shell — semantic aliases for dashboards */
-  --app-primary: #111111;
-  --app-primary-fg: #f4efe8;
-  --app-success: #16a34a;
-  --app-warning: #ca8a04;
-  --app-danger: #dc2626;
-  --app-info: #2563eb;
-  --app-muted: #737373;
-  --app-accent-employee: #7c3aed;
-}
+  --brand-deep: #546b41;
+  --brand-sage: #99ad7a;
+  --brand-sand: #dcccac;
+  --brand-cream: #fff8ec;
 
-.dark {
-  --bg: #121210;
-  --bg-panel: rgba(28, 28, 24, 0.78);
-  --ink: #f6f4ef;
-  --ink-soft: #c7c2b8;
-  --line: rgba(255, 255, 255, 0.2);
-  --accent: #7ee9d8;
-  --accent-soft: rgba(126, 233, 216, 0.14);
-  --hero-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
-  --background: #121210;
-  --foreground: #f6f4ef;
-  --card: rgba(28, 28, 24, 0.78);
-  --card-foreground: #f6f4ef;
-  --popover: #1c1c18;
-  --popover-foreground: #f6f4ef;
-  --primary: #f6f4ef;
-  --primary-foreground: #121210;
-  --secondary: #2a2a24;
-  --secondary-foreground: #f6f4ef;
-  --muted: #2a2a24;
-  --muted-foreground: #c7c2b8;
-  --accent-foreground: #121210;
-  --destructive: #ef4444;
-  --border: rgba(255, 255, 255, 0.2);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #7ee9d8;
-  --radius: 0.625rem;
-  --sidebar: #121210;
-  --sidebar-foreground: #f6f4ef;
-  --sidebar-primary: #7ee9d8;
-  --sidebar-primary-foreground: #121210;
-  --sidebar-accent: #2a2a24;
-  --sidebar-accent-foreground: #f6f4ef;
-  --sidebar-border: rgba(255, 255, 255, 0.2);
-  --sidebar-ring: #7ee9d8;
-  --app-primary: #f6f4ef;
-  --app-primary-fg: #121210;
-  --app-success: #4ade80;
-  --app-warning: #fbbf24;
-  --app-danger: #f87171;
-  --app-info: #60a5fa;
-  --app-muted: #a3a3a3;
-  --app-accent-employee: #c4b5fd;
+  --bg: #0c0f09;
+  --bg-panel: rgba(19, 26, 16, 0.82);
+  --ink: var(--brand-cream);
+  --ink-soft: color-mix(in srgb, var(--brand-sand) 88%, transparent);
+  --line: color-mix(in srgb, var(--brand-sand) 22%, transparent);
+  --accent: var(--brand-sage);
+  --accent-soft: color-mix(in srgb, var(--brand-sage) 18%, transparent);
+  --hero-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+
+  --background: #0c0f09;
+  --foreground: var(--brand-cream);
+  --card: #131a10;
+  --card-foreground: var(--brand-cream);
+  --popover: #161e12;
+  --popover-foreground: var(--brand-cream);
+  --primary: var(--brand-sage);
+  --primary-foreground: #0c0f09;
+  --secondary: color-mix(in srgb, var(--brand-deep) 35%, #0c0f09);
+  --secondary-foreground: var(--brand-cream);
+  --muted: #1a2214;
+  --muted-foreground: color-mix(in srgb, var(--brand-sand) 75%, #0c0f09);
+  --accent-foreground: #0c0f09;
+  --destructive: #e07070;
+  --border: color-mix(in srgb, var(--brand-sand) 16%, transparent);
+  --input: color-mix(in srgb, var(--brand-sand) 12%, transparent);
+  --ring: var(--brand-sage);
+  --radius: 0.75rem;
+  --sidebar: #0e120c;
+  --sidebar-foreground: var(--brand-cream);
+  --sidebar-primary: var(--brand-sage);
+  --sidebar-primary-foreground: #0c0f09;
+  --sidebar-accent: #1a2214;
+  --sidebar-accent-foreground: var(--brand-cream);
+  --sidebar-border: color-mix(in srgb, var(--brand-sand) 14%, transparent);
+  --sidebar-ring: var(--brand-sage);
+
+  --app-primary: var(--brand-sage);
+  --app-primary-fg: #0c0f09;
+  --app-success: #7cb878;
+  --app-warning: #d4a574;
+  --app-danger: #e07070;
+  --app-info: color-mix(in srgb, var(--brand-sage) 90%, white);
+  --app-muted: color-mix(in srgb, var(--brand-sand) 55%, #0c0f09);
+  --app-accent-employee: #b8a8e8;
 }
 
 * {
@@ -107,6 +69,10 @@ html,
 body {
   margin: 0;
   padding: 0;
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
@@ -122,19 +88,39 @@ body {
   padding: 1.2rem 1rem 2.5rem;
 }
 
+.swift-shell > .swift-nav,
+.swift-shell > section,
+.swift-shell > footer {
+  position: relative;
+  z-index: 1;
+}
+
 .swift-mesh {
   pointer-events: none;
   position: absolute;
   inset: -18%;
   z-index: -1;
   background:
-    radial-gradient(circle at 18% 8%, rgba(15, 111, 99, 0.23), transparent 42%),
     radial-gradient(
-      circle at 84% 28%,
-      rgba(237, 174, 73, 0.26),
-      transparent 36%
+      circle at 18% 12%,
+      color-mix(in srgb, var(--brand-sage) 28%, transparent),
+      transparent 46%
     ),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 48%);
+    radial-gradient(
+      circle at 82% 22%,
+      color-mix(in srgb, var(--brand-deep) 35%, transparent),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 50% 88%,
+      color-mix(in srgb, var(--brand-sand) 12%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--brand-cream) 0.06, transparent),
+      transparent 55%
+    );
   animation: meshDrift 16s ease-in-out infinite alternate;
 }
 
@@ -236,15 +222,54 @@ body {
   letter-spacing: 0.06em;
 }
 
-.swift-hero {
+.swift-hero-wrap {
   margin: 0 auto;
   width: min(1120px, 100%);
+  position: relative;
+}
+
+.swift-hero {
+  margin: 0 auto;
+  width: 100%;
   border: 1px solid var(--line);
   border-radius: 30px;
   background: var(--bg-panel);
   padding: clamp(1.4rem, 4vw, 3.2rem);
   box-shadow: var(--hero-shadow);
   animation: rise 700ms ease;
+}
+
+.swift-hero--flush {
+  margin: 0;
+}
+
+.swift-hero-media {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--bg-panel) 92%, transparent);
+  padding: clamp(1rem, 3vw, 1.35rem);
+  backdrop-filter: blur(10px);
+}
+
+.landing-media-kicker {
+  margin-bottom: 0.35rem;
+}
+
+.landing-media-lead {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.swift-hero-orbit {
+  top: 8%;
+  right: 4%;
+}
+
+.swift-hero-orbit-2 {
+  bottom: 18%;
+  left: 3%;
 }
 
 .swift-kicker {
@@ -283,8 +308,12 @@ body {
 .swift-button {
   border: 0;
   border-radius: 999px;
-  background: var(--ink);
-  color: var(--bg);
+  background: linear-gradient(
+    135deg,
+    var(--brand-sage),
+    color-mix(in srgb, var(--brand-sage) 82%, var(--brand-deep))
+  );
+  color: var(--primary-foreground);
   text-decoration: none;
   padding: 0.78rem 1.7rem;
   font-size: 0.92rem;
@@ -300,7 +329,9 @@ body {
 
 .swift-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 12px 32px color-mix(in srgb, var(--brand-sage) 35%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--brand-cream) 0.2, transparent);
 }
 
 .swift-button::after {
@@ -454,8 +485,13 @@ body {
 }
 
 .feature-tab.is-active {
-  background: var(--ink);
-  color: var(--bg);
+  background: linear-gradient(
+    135deg,
+    var(--brand-sage),
+    color-mix(in srgb, var(--brand-deep) 55%, var(--brand-sage))
+  );
+  color: var(--primary-foreground);
+  border-color: color-mix(in srgb, var(--brand-sage) 40%, transparent);
 }
 
 .feature-tab-panel {
@@ -541,6 +577,116 @@ body {
   opacity: 0.74;
 }
 
+/* Landing — embedded GIF strip */
+.landing-gif-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .landing-gif-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.landing-gif-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.landing-gif-frame {
+  position: relative;
+  aspect-ratio: 16 / 11;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand-deep) 40%, #0c0f09),
+    #131a10
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--brand-sage) 0.15, transparent),
+    var(--hero-shadow);
+}
+
+.landing-gif-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 20%,
+    color-mix(in srgb, var(--brand-sage) 0.2, transparent),
+    transparent 55%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: gifSheen 5s ease-in-out infinite alternate;
+}
+
+.landing-gif-img {
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.landing-gif-caption {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+@keyframes gifSheen {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+/* Hero bento */
+.landing-hero-bento {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .landing-hero-bento {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: start;
+  }
+}
+
+.landing-orbit {
+  position: absolute;
+  z-index: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in srgb, var(--brand-sand) 0.25, transparent);
+  animation: orbitSpin 28s linear infinite;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.landing-orbit--delayed {
+  animation-delay: -8s;
+  width: 200px;
+  height: 200px;
+  opacity: 0.22;
+}
+
+@keyframes orbitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(16px);
@@ -597,6 +743,10 @@ body {
 
 .reveal-13 {
   animation-delay: 840ms;
+}
+
+.reveal-14 {
+  animation-delay: 900ms;
 }
 
 @media (min-width: 800px) {
@@ -755,14 +905,14 @@ body {
   --fc-border-color: var(--border);
   --fc-page-bg-color: transparent;
   --fc-neutral-bg-color: color-mix(in srgb, var(--muted) 85%, transparent);
-  --fc-today-bg-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  --fc-today-bg-color: color-mix(in srgb, var(--brand-sage) 14%, transparent);
   --fc-list-event-hover-bg-color: color-mix(in srgb, var(--muted) 50%, transparent);
-  --fc-highlight-color: color-mix(in srgb, var(--ring) 18%, transparent);
-  --fc-button-bg-color: var(--foreground);
-  --fc-button-border-color: var(--border);
-  --fc-button-text-color: var(--background);
-  --fc-button-hover-bg-color: color-mix(in srgb, var(--foreground) 88%, var(--background));
-  --fc-button-active-bg-color: color-mix(in srgb, var(--foreground) 78%, var(--background));
+  --fc-highlight-color: color-mix(in srgb, var(--brand-sage) 22%, transparent);
+  --fc-button-bg-color: var(--brand-sage);
+  --fc-button-border-color: color-mix(in srgb, var(--brand-deep) 55%, var(--brand-sage));
+  --fc-button-text-color: var(--primary-foreground);
+  --fc-button-hover-bg-color: color-mix(in srgb, var(--brand-sage) 88%, var(--brand-deep));
+  --fc-button-active-bg-color: color-mix(in srgb, var(--brand-sage) 78%, var(--brand-deep));
 }
 
 .fc .fc-toolbar-title {
