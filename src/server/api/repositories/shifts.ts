@@ -1,7 +1,7 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import type { ShiftInput, UpdateShiftInput } from "~/lib/schemas/shifts";
 import { db } from "~/server/db";
-import { shifts, user } from "~/server/db/schema";
+import { shiftRequests, shifts, user } from "~/server/db/schema";
 
 export const getAllShiftsDb = async () => {
   return db
@@ -19,6 +19,34 @@ export const getAllShiftsDb = async () => {
     })
     .from(shifts)
     .innerJoin(user, eq(shifts.managerId, user.id));
+};
+
+export const getApprovedBookingCountsDb = async () => {
+  return db
+    .select({
+      shiftId: shiftRequests.shiftId,
+      booked: count(shiftRequests.id),
+    })
+    .from(shiftRequests)
+    .where(eq(shiftRequests.status, "approved"))
+    .groupBy(shiftRequests.shiftId);
+};
+
+export const getPublishedShiftsWithManagerDb = async () => {
+  return db
+    .select({
+      id: shifts.id,
+      title: shifts.title,
+      startTime: shifts.startTime,
+      endTime: shifts.endTime,
+      maxEmployees: shifts.maxEmployees,
+      status: shifts.status,
+      managerId: shifts.managerId,
+      managerName: user.name,
+    })
+    .from(shifts)
+    .innerJoin(user, eq(shifts.managerId, user.id))
+    .where(eq(shifts.status, "published"));
 };
 
 export const getManagerShiftDb = async (shiftId: number, managerId: number) => {

@@ -43,6 +43,15 @@
   --sidebar-accent-foreground: #111111;
   --sidebar-border: rgba(16, 16, 16, 0.16);
   --sidebar-ring: #0f6f63;
+  /* App shell — semantic aliases for dashboards */
+  --app-primary: #111111;
+  --app-primary-fg: #f4efe8;
+  --app-success: #16a34a;
+  --app-warning: #ca8a04;
+  --app-danger: #dc2626;
+  --app-info: #2563eb;
+  --app-muted: #737373;
+  --app-accent-employee: #7c3aed;
 }
 
 .dark {
@@ -80,6 +89,14 @@
   --sidebar-accent-foreground: #f6f4ef;
   --sidebar-border: rgba(255, 255, 255, 0.2);
   --sidebar-ring: #7ee9d8;
+  --app-primary: #f6f4ef;
+  --app-primary-fg: #121210;
+  --app-success: #4ade80;
+  --app-warning: #fbbf24;
+  --app-danger: #f87171;
+  --app-info: #60a5fa;
+  --app-muted: #a3a3a3;
+  --app-accent-employee: #c4b5fd;
 }
 
 * {
@@ -731,4 +748,58 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* FullCalendar — theme alignment (FC v6 injects structure; we tune tokens) */
+.fc {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: color-mix(in srgb, var(--muted) 85%, transparent);
+  --fc-today-bg-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  --fc-list-event-hover-bg-color: color-mix(in srgb, var(--muted) 50%, transparent);
+  --fc-highlight-color: color-mix(in srgb, var(--ring) 18%, transparent);
+  --fc-button-bg-color: var(--foreground);
+  --fc-button-border-color: var(--border);
+  --fc-button-text-color: var(--background);
+  --fc-button-hover-bg-color: color-mix(in srgb, var(--foreground) 88%, var(--background));
+  --fc-button-active-bg-color: color-mix(in srgb, var(--foreground) 78%, var(--background));
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.fc .fc-col-header-cell {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+
+.fc .fc-timegrid-slot-label {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+}
+
+.fc .fc-event {
+  border-radius: 6px;
+  border-width: 1px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.fc .fc-event-title {
+  font-weight: 600;
+}
+
+.fc .fc-scrollgrid {
+  border-radius: 0.75rem;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: var(--border);
 }

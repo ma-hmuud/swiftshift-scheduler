@@ -2,6 +2,7 @@ import z from "zod";
 import { managerProcedure } from "./manager";
 import { tryCatch } from "~/lib/utils/try-catch";
 import {
+  getAllShiftRequestsForManagerDb,
   getEmployeeShiftRequestsDb,
   getManagerShiftsRequestsDb,
   replyToShiftRequestDb,
@@ -13,6 +14,25 @@ import { getAvailabilityDb } from "../repositories/availability";
 import { getOneShiftDb } from "../repositories/shifts";
 
 // Manager proces
+export const shiftRequestsListAllForManagerProc = managerProcedure.query(
+  async ({ ctx }) => {
+    const managerId = Number(ctx.session.user.id);
+
+    const { data: shiftRequests, error: shiftRequestsError } = await tryCatch(
+      getAllShiftRequestsForManagerDb(managerId),
+    );
+    if (shiftRequestsError) {
+      console.error("Error fetching shift requests:", shiftRequestsError);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch shift requests",
+      });
+    }
+
+    return { ok: true, data: shiftRequests };
+  },
+);
+
 export const shiftRequestsGetAllProc = managerProcedure
   .input(
     z.object({

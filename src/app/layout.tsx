@@ -3,7 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Cormorant_Garamond, Manrope, Geist } from "next/font/google";
 
-import { TRPCReactProvider } from "~/trpc/react";
+import { AppProviders } from "~/app/_components/app-providers";
 import { cn } from "~/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -47,7 +47,7 @@ export default function RootLayout({
     >
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

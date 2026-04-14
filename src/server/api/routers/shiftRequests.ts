@@ -1,6 +1,7 @@
 import {
   shiftRequestsEmployeeProc,
   shiftRequestsGetAllProc,
+  shiftRequestsListAllForManagerProc,
   shiftRequestsReplyProc,
   shiftRequestsSendProc,
 } from "../procedures/shiftRequests";
@@ -15,9 +16,7 @@ export const shiftRequestsEmployeeRouter = createTRPCRouter({
 });
 
 export const shiftRequestsManagerRouter = createTRPCRouter({
-  // get proc
+  listAll: shiftRequestsListAllForManagerProc,
   list: shiftRequestsGetAllProc,
-
-  // reply proc
   reply: shiftRequestsReplyProc,
 });

@@ -1,37 +1,58 @@
+import { TRPCError } from "@trpc/server";
+import z from "zod";
+
+import {
+  createShiftClientSchema,
+  createShiftSchema,
+  updateShiftSchema,
+} from "~/lib/schemas/shifts";
 import { tryCatch } from "~/lib/utils/try-catch";
+import { getAvailabilityDb } from "../repositories/availability";
+import { getManagerByIdDb } from "../repositories/manager";
 import {
   createShiftDb,
   deleteShiftDb,
   getAllShiftsDb,
+  getApprovedBookingCountsDb,
+  getPublishedShiftsWithManagerDb,
   updateShiftDb,
 } from "../repositories/shifts";
+import { getEmployeeShiftRequestsDb } from "../repositories/shiftRequests";
+import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
-import { TRPCError } from "@trpc/server";
-import { createShiftSchema, updateShiftSchema } from "~/lib/schemas/shifts";
-import { getManagerByIdDb } from "../repositories/manager";
-import z from "zod";
 import { protectedProcedure } from "../trpc";
-import { getAvailabilityDb } from "../repositories/availability";
 
 export const shiftsGetAllProc = managerProcedure.query(async () => {
-  const { data: shiftsDb, error: shiftsError } =
-    await tryCatch(getAllShiftsDb());
+  const { data, error } = await tryCatch(
+    Promise.all([getAllShiftsDb(), getApprovedBookingCountsDb()]),
+  );
 
-  if (shiftsError) {
-    console.error("Error fetching shifts:", shiftsError.message);
+  if (error) {
+    console.error("Error fetching shifts:", error.message);
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Failed to fetch shifts",
     });
   }
 
-  return { ok: true, data: shiftsDb };
+  const [shiftsDb, counts] = data;
+  const countMap = new Map(counts.map((c) => [c.shiftId, c.booked]));
+
+  return {
+    ok: true,
+    data: shiftsDb.map((s) => ({
+      ...s,
+      bookedCount: countMap.get(s.id) ?? 0,
+    })),
+  };
 });
 
 export const shiftsCreateProc = managerProcedure
-  .input(createShiftSchema)
-  .mutation(async ({ input }) => {
-    const { managerId } = input;
+  .input(createShiftClientSchema)
+  .mutation(async ({ ctx, input }) => {
+    const managerId = Number(ctx.session.user.id);
+    const payload = createShiftSchema.parse({ ...input, managerId });
+
     const { data: manager, error: managerError } = await tryCatch(
       getManagerByIdDb(managerId),
     );
@@ -52,7 +73,7 @@ export const shiftsCreateProc = managerProcedure
     }
 
     const { data: newShift, error: newShiftError } = await tryCatch(
-      createShiftDb(input),
+      createShiftDb(payload),
     );
     if (newShiftError && !newShift) {
       console.error("Error creating shift:", newShiftError.message);
@@ -127,12 +148,17 @@ export const shiftsDeleteProc = managerProcedure
     return { ok: true, data: deletedShift };
   });
 
+/** Legacy list for employees — same filtering as calendar without per-shift request metadata. */
 export const shiftsGetPublishedProc = protectedProcedure.query(
   async ({ ctx }) => {
     const { id: employeeId } = ctx.session.user;
 
     const { data, error } = await tryCatch(
-      Promise.all([getAvailabilityDb(Number(employeeId)), getAllShiftsDb()]),
+      Promise.all([
+        getAvailabilityDb(Number(employeeId)),
+        getPublishedShiftsWithManagerDb(),
+        getApprovedBookingCountsDb(),
+      ]),
     );
     if (error) {
       console.error(
@@ -145,7 +171,7 @@ export const shiftsGetPublishedProc = protectedProcedure.query(
       });
     }
 
-    const [availability, shifts] = data;
+    const [availability, publishedShifts, counts] = data;
 
     if (!availability) {
       throw new TRPCError({
@@ -154,25 +180,102 @@ export const shiftsGetPublishedProc = protectedProcedure.query(
           "Employee availability not found. Please set your availability before sending shift requests.",
       });
     }
-    if (!shifts) {
+    if (!publishedShifts) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Shifts not found",
       });
     }
 
-    // Filter shifts to only include those that are published and match the employee's availability
-    const publishedShifts = shifts.filter((shift) => {
+    const countMap = new Map(counts.map((c) => [c.shiftId, c.booked]));
+
+    const { daysOfWeek } = availability as {
+      daysOfWeek: Record<number, boolean>;
+    };
+
+    const filtered = publishedShifts.filter((shift) => {
       const shiftStartDay = new Date(shift.startTime).getUTCDay();
       const shiftEndDay = new Date(shift.endTime).getUTCDay();
-      const { daysOfWeek } = availability as {
-        daysOfWeek: Record<number, boolean>;
-      };
-
       const isAvailable = daysOfWeek[shiftStartDay] && daysOfWeek[shiftEndDay];
-      return shift.status === "published" && isAvailable;
+      return isAvailable;
     });
 
-    return { ok: true, data: publishedShifts };
+    return {
+      ok: true,
+      data: filtered.map((s) => ({
+        ...s,
+        bookedCount: countMap.get(s.id) ?? 0,
+      })),
+    };
+  },
+);
+
+function latestRequestStatusByShift(
+  rows: { shiftId: number; status: string; createdAt: Date }[],
+) {
+  const sorted = [...rows].sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+  );
+  const map = new Map<number, string>();
+  for (const r of sorted) {
+    if (!map.has(r.shiftId)) {
+      map.set(r.shiftId, r.status);
+    }
+  }
+  return map;
+}
+
+export const shiftsCalendarForEmployeeProc = employeeProcedure.query(
+  async ({ ctx }) => {
+    const employeeId = Number(ctx.session.user.id);
+
+    const { data, error } = await tryCatch(
+      Promise.all([
+        getAvailabilityDb(employeeId),
+        getPublishedShiftsWithManagerDb(),
+        getApprovedBookingCountsDb(),
+        getEmployeeShiftRequestsDb(employeeId),
+      ]),
+    );
+
+    if (error) {
+      console.error("Error building employee calendar:", error.message);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to load calendar",
+      });
+    }
+
+    const [availability, publishedShifts, counts, myRequests] = data;
+
+    if (!availability) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message:
+          "Employee availability not found. Please set your availability before viewing shifts.",
+      });
+    }
+
+    const countMap = new Map(counts.map((c) => [c.shiftId, c.booked]));
+    const statusByShift = latestRequestStatusByShift(myRequests);
+
+    const { daysOfWeek } = availability as {
+      daysOfWeek: Record<number, boolean>;
+    };
+
+    const filtered = publishedShifts.filter((shift) => {
+      const shiftStartDay = new Date(shift.startTime).getUTCDay();
+      const shiftEndDay = new Date(shift.endTime).getUTCDay();
+      return Boolean(daysOfWeek[shiftStartDay] && daysOfWeek[shiftEndDay]);
+    });
+
+    return {
+      ok: true,
+      data: filtered.map((s) => ({
+        ...s,
+        bookedCount: countMap.get(s.id) ?? 0,
+        myRequestStatus: statusByShift.get(s.id) ?? null,
+      })),
+    };
   },
 );

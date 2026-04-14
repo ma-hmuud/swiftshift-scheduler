@@ -11,6 +11,7 @@ const baseShiftSchema = z.object({
     .number()
     .int()
     .positive("Max employees must be a positive integer"),
+  status: z.enum(["draft", "published"]).default("draft"),
   managerId: z.number().int().positive("Manager ID must be a positive integer"),
 });
 
@@ -18,10 +19,15 @@ export const createShiftSchema = baseShiftSchema.refine(
   (data) => data.endTime > data.startTime,
 );
 
+/** Client / API input — manager id is taken from the session server-side. */
+export const createShiftClientSchema = baseShiftSchema
+  .omit({ managerId: true })
+  .refine((data) => data.endTime > data.startTime);
+
 export const updateShiftSchema = baseShiftSchema
   .omit({ managerId: true })
   .extend({
-    id: z.number().int().positive("Manager ID must be a positive integer"),
+    id: z.number().int().positive("Shift ID must be a positive integer"),
     status: z.enum(["draft", "published", "cancelled", "filled"]),
   })
   .partial()
@@ -30,4 +36,5 @@ export const updateShiftSchema = baseShiftSchema
   );
 
 export type ShiftInput = z.infer<typeof createShiftSchema>;
+export type CreateShiftClientInput = z.infer<typeof createShiftClientSchema>;
 export type UpdateShiftInput = z.infer<typeof updateShiftSchema>;

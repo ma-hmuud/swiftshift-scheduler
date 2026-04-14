@@ -3,6 +3,7 @@ import {
   shiftsCreateProc,
   shiftsUpdateProc,
   shiftsDeleteProc,
+  shiftsCalendarForEmployeeProc,
 } from "../procedures/shifts";
 import { createTRPCRouter } from "../trpc";
 
@@ -21,6 +22,5 @@ export const shiftsRouter = createTRPCRouter({
 });
 
 export const shiftsEmployeeRouter = createTRPCRouter({
-  // get proc
-  list: shiftsGetAllProc,
+  calendar: shiftsCalendarForEmployeeProc,
 });
