@@ -21,7 +21,6 @@ import {
 import { getEmployeeShiftRequestsDb } from "../repositories/shiftRequests";
 import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
-import { protectedProcedure } from "../trpc";
 
 export const shiftsGetAllProc = managerProcedure.query(async () => {
   const { data, error } = await tryCatch(
@@ -148,69 +147,6 @@ export const shiftsDeleteProc = managerProcedure
 
     return { ok: true, data: deletedShift };
   });
-
-/** Legacy list for employees — same filtering as calendar without per-shift request metadata. */
-export const shiftsGetPublishedProc = protectedProcedure.query(
-  async ({ ctx }) => {
-    const { id: employeeId } = ctx.session.user;
-
-    const { data, error } = await tryCatch(
-      Promise.all([
-        getAvailabilityDb(Number(employeeId)),
-        getPublishedShiftsWithManagerDb(),
-        getApprovedBookingCountsDb(),
-      ]),
-    );
-    if (error) {
-      console.error(
-        "Error fetching employee availability or shifts: ",
-        error.message,
-      );
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to fetch employee availability or shifts",
-      });
-    }
-
-    const [availability, publishedShifts, counts] = data;
-
-    if (!availability) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message:
-          "Employee availability not found. Please set your availability before sending shift requests.",
-      });
-    }
-    if (!publishedShifts) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Shifts not found",
-      });
-    }
-
-    const countMap = new Map(counts.map((c) => [c.shiftId, c.booked]));
-
-    const { daysOfWeek } = availability as {
-      daysOfWeek: Record<number, boolean>;
-    };
-
-    const filtered = publishedShifts.filter((shift) => {
-      if (!isShiftStillOpen(shift.endTime)) return false;
-      const shiftStartDay = new Date(shift.startTime).getUTCDay();
-      const shiftEndDay = new Date(shift.endTime).getUTCDay();
-      const isAvailable = daysOfWeek[shiftStartDay] && daysOfWeek[shiftEndDay];
-      return isAvailable;
-    });
-
-    return {
-      ok: true,
-      data: filtered.map((s) => ({
-        ...s,
-        bookedCount: countMap.get(s.id) ?? 0,
-      })),
-    };
-  },
-);
 
 function latestRequestStatusByShift(
   rows: { shiftId: number; status: string; createdAt: Date }[],
