@@ -6,6 +6,7 @@ import {
   createShiftSchema,
   updateShiftSchema,
 } from "~/lib/schemas/shifts";
+import { isShiftStillOpen } from "~/lib/shifts/time";
 import { tryCatch } from "~/lib/utils/try-catch";
 import { getAvailabilityDb } from "../repositories/availability";
 import { getManagerByIdDb } from "../repositories/manager";
@@ -194,6 +195,7 @@ export const shiftsGetPublishedProc = protectedProcedure.query(
     };
 
     const filtered = publishedShifts.filter((shift) => {
+      if (!isShiftStillOpen(shift.endTime)) return false;
       const shiftStartDay = new Date(shift.startTime).getUTCDay();
       const shiftEndDay = new Date(shift.endTime).getUTCDay();
       const isAvailable = daysOfWeek[shiftStartDay] && daysOfWeek[shiftEndDay];
@@ -264,6 +266,7 @@ export const shiftsCalendarForEmployeeProc = employeeProcedure.query(
     };
 
     const filtered = publishedShifts.filter((shift) => {
+      if (!isShiftStillOpen(shift.endTime)) return false;
       const shiftStartDay = new Date(shift.startTime).getUTCDay();
       const shiftEndDay = new Date(shift.endTime).getUTCDay();
       return Boolean(daysOfWeek[shiftStartDay] && daysOfWeek[shiftEndDay]);

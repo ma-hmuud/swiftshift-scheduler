@@ -31,9 +31,17 @@ export const updateShiftSchema = baseShiftSchema
     status: z.enum(["draft", "published", "cancelled", "filled"]),
   })
   .partial()
-  .refine(
-    (data) => data.startTime && data.endTime && data.endTime > data.startTime,
-  );
+  .superRefine((data, ctx) => {
+    if (data.startTime !== undefined && data.endTime !== undefined) {
+      if (data.endTime <= data.startTime) {
+        ctx.addIssue({
+          code: "custom",
+          message: "End time must be after start time",
+          path: ["endTime"],
+        });
+      }
+    }
+  });
 
 export type ShiftInput = z.infer<typeof createShiftSchema>;
 export type CreateShiftClientInput = z.infer<typeof createShiftClientSchema>;

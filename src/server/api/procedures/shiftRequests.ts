@@ -10,6 +10,7 @@ import {
 } from "../repositories/shiftRequests";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure } from "../trpc";
+import { hasShiftEnded } from "~/lib/shifts/time";
 import { getAvailabilityDb } from "../repositories/availability";
 import { getOneShiftDb } from "../repositories/shifts";
 
@@ -159,6 +160,13 @@ export const shiftRequestsSendProc = protectedProcedure
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Shift not found",
+      });
+    }
+
+    if (hasShiftEnded(shift.endTime)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "This shift has already ended.",
       });
     }
 

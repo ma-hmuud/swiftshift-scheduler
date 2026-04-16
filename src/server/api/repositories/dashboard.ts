@@ -2,6 +2,7 @@ import "server-only";
 
 import { count, desc, eq } from "drizzle-orm";
 
+import { isShiftStillOpen } from "~/lib/shifts/time";
 import { db } from "~/server/db";
 import { shiftRequests, shifts, user } from "~/server/db/schema";
 
@@ -171,8 +172,9 @@ export const getEmployeeDashboardData = async (
     (availabilityRecord?.daysOfWeek as AvailabilityDays | undefined) ?? null;
 
   const shiftsCount = availabilityDays
-    ? publishedShifts.filter((shift) => matchesAvailability(availabilityDays, shift))
-        .length
+    ? publishedShifts
+        .filter((shift) => isShiftStillOpen(shift.endTime))
+        .filter((shift) => matchesAvailability(availabilityDays, shift)).length
     : 0;
 
   return {
