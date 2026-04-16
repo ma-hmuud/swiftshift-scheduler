@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, ne } from "drizzle-orm";
 import type { ShiftInput, UpdateShiftInput } from "~/lib/schemas/shifts";
 import { db } from "~/server/db";
 import { shiftRequests, shifts, user } from "~/server/db/schema";
@@ -58,6 +58,41 @@ export const getManagerShiftDb = async (shiftId: number, managerId: number) => {
     })
     .from(shifts)
     .where(and(eq(shifts.id, shiftId), eq(shifts.managerId, managerId)));
+};
+
+/** Full row for merge + conflict checks (manager-owned shift). */
+export const getManagerShiftRowDb = async (shiftId: number, managerId: number) => {
+  return db
+    .select({
+      id: shifts.id,
+      title: shifts.title,
+      startTime: shifts.startTime,
+      endTime: shifts.endTime,
+      status: shifts.status,
+    })
+    .from(shifts)
+    .where(and(eq(shifts.id, shiftId), eq(shifts.managerId, managerId)))
+    .then((res) => res[0]);
+};
+
+/** Active shifts (not cancelled) for overlap detection. Optional row excluded on update. */
+export const listNonCancelledShiftsForOverlapDb = async (
+  managerId: number,
+  excludeShiftId?: number,
+) => {
+  const conditions = [eq(shifts.managerId, managerId), ne(shifts.status, "cancelled")];
+  if (excludeShiftId !== undefined) {
+    conditions.push(ne(shifts.id, excludeShiftId));
+  }
+  return db
+    .select({
+      id: shifts.id,
+      title: shifts.title,
+      startTime: shifts.startTime,
+      endTime: shifts.endTime,
+    })
+    .from(shifts)
+    .where(and(...conditions));
 };
 
 export const getOneShiftDb = async (shiftId: number) => {

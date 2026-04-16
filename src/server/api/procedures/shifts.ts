@@ -6,6 +6,7 @@ import {
   createShiftSchema,
   updateShiftSchema,
 } from "~/lib/schemas/shifts";
+import { timeIntervalsOverlap } from "~/lib/shifts/overlap";
 import { isShiftStillOpen } from "~/lib/shifts/time";
 import { tryCatch } from "~/lib/utils/try-catch";
 import { getAvailabilityDb } from "../repositories/availability";
@@ -15,12 +16,26 @@ import {
   deleteShiftDb,
   getAllShiftsDb,
   getApprovedBookingCountsDb,
+  getManagerShiftRowDb,
   getPublishedShiftsWithManagerDb,
+  listNonCancelledShiftsForOverlapDb,
   updateShiftDb,
 } from "../repositories/shifts";
 import { getEmployeeShiftRequestsDb } from "../repositories/shiftRequests";
 import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
+
+function findOverlappingShiftTitles(
+  candidateStart: string,
+  candidateEnd: string,
+  others: { title: string; startTime: string; endTime: string }[],
+): string[] {
+  return others
+    .filter((row) =>
+      timeIntervalsOverlap(candidateStart, candidateEnd, row.startTime, row.endTime),
+    )
+    .map((row) => row.title);
+}
 
 export const shiftsGetAllProc = managerProcedure.query(async () => {
   const { data, error } = await tryCatch(
@@ -72,6 +87,29 @@ export const shiftsCreateProc = managerProcedure
       });
     }
 
+    const { data: siblings, error: siblingsError } = await tryCatch(
+      listNonCancelledShiftsForOverlapDb(managerId),
+    );
+    if (siblingsError) {
+      console.error("Error loading shifts for overlap check:", siblingsError.message);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to validate shift schedule",
+      });
+    }
+
+    const overlappingTitles = findOverlappingShiftTitles(
+      payload.startTime,
+      payload.endTime,
+      siblings,
+    );
+    if (overlappingTitles.length > 0) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `This time range overlaps another shift: ${overlappingTitles.map((t) => `"${t}"`).join(", ")}. Change the times or cancel the other shift first.`,
+      });
+    }
+
     const { data: newShift, error: newShiftError } = await tryCatch(
       createShiftDb(payload),
     );
@@ -96,6 +134,58 @@ export const shiftsUpdateProc = managerProcedure
         code: "NOT_FOUND",
         message: "Shift ID must be exist",
       });
+
+    const { data: existing, error: existingError } = await tryCatch(
+      getManagerShiftRowDb(shiftId, Number(managerId)),
+    );
+    if (existingError) {
+      console.error("Error loading shift for update:", existingError.message);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to load shift",
+      });
+    }
+    if (!existing) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Shift not found or you don't have permission to update it",
+      });
+    }
+
+    const mergedStatus = newShift.status ?? existing.status;
+    if (mergedStatus !== "cancelled") {
+      const mergedStart = newShift.startTime ?? existing.startTime;
+      const mergedEnd = newShift.endTime ?? existing.endTime;
+      if (mergedEnd <= mergedStart) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "End time must be after start time.",
+        });
+      }
+
+      const { data: siblings, error: siblingsError } = await tryCatch(
+        listNonCancelledShiftsForOverlapDb(Number(managerId), shiftId),
+      );
+      if (siblingsError) {
+        console.error("Error loading shifts for overlap check:", siblingsError.message);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to validate shift schedule",
+        });
+      }
+
+      const overlappingTitles = findOverlappingShiftTitles(
+        mergedStart,
+        mergedEnd,
+        siblings,
+      );
+      if (overlappingTitles.length > 0) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `This time range overlaps another shift: ${overlappingTitles.map((t) => `"${t}"`).join(", ")}. Change the times or cancel the other shift first.`,
+        });
+      }
+    }
 
     const { data: updatedShift, error: updatedShiftError } = await tryCatch(
       updateShiftDb(shiftId, newShift, Number(managerId)),
