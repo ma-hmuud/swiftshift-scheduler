@@ -3,6 +3,7 @@ import { tryCatch } from "~/lib/utils/try-catch";
 import { assignManagerDb } from "../repositories/manager";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure } from "../trpc";
+import { getManagerDashboardData } from "../repositories/dashboard";
 
 // Manager middleware to check if the user has a manager role
 export const managerProcedure = protectedProcedure.use(
@@ -46,3 +47,21 @@ export const assignManagerProc = managerProcedure
 
     return { ok: true, data: updatedUser };
   });
+
+export const dashboardProc = managerProcedure.query(async ({ ctx }) => {
+  const { id: managerId } = ctx.session.user;
+
+  const { data: dashboardData, error: dashError } = await tryCatch(
+    getManagerDashboardData(Number(managerId)),
+  );
+
+  if (dashError) {
+    console.error("Error fetching manager dashboard data:", dashError.message);
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Failed to fetch manager dashboard data",
+    });
+  }
+
+  return { ok: true, data: dashboardData };
+});

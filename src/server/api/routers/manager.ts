@@ -1,5 +1,5 @@
 import { createTRPCRouter } from "../trpc";
-import { assignManagerProc } from "../procedures/manager";
+import { assignManagerProc, dashboardProc } from "../procedures/manager";
 import { shiftsRouter } from "./shifts";
 import { shiftRequestsManagerRouter } from "./shiftRequests";
 import { employeesRouter } from "./employees";
@@ -9,4 +9,5 @@ export const managerRouter = createTRPCRouter({
   shifts: shiftsRouter,
   shiftRequests: shiftRequestsManagerRouter,
   employees: employeesRouter,
+  dashboard: dashboardProc,
 });

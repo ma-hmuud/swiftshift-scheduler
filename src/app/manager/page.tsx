@@ -11,8 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { getManagerDashboardData } from "~/server/api/repositories/dashboard";
 import { getSession } from "~/server/better-auth/server";
+import { api } from "~/trpc/react";
+import { EmptyState } from "~/components/ui/empty-state";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Button } from "~/components/ui/button";
 
 export default async function ManagerDashboardPage() {
   const session = await getSession();
@@ -20,7 +23,17 @@ export default async function ManagerDashboardPage() {
     redirect("/login");
   }
 
-  const d = await getManagerDashboardData(Number(session.user.id));
+  const { data, isLoading, isError, error, refetch } = api.manager.dashboard.useQuery(undefined);
+
+  if (!data) return (
+    <div className="mx-auto max-w-4xl space-y-8">
+      <div className="space-y-2">
+        <EmptyState title="Data is not loaded yet" description="Please wait while we load your dashboard data." />
+      </div>
+    </div>
+  );
+
+  const { data: dashboard } = data;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -40,50 +53,62 @@ export default async function ManagerDashboardPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Open requests</CardDescription>
-            <CardTitle className="text-3xl tabular-nums">{d.requestsCount}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/manager/requests"
-              className="text-sm font-medium text-[var(--app-primary)] hover:underline"
-            >
-              Review queue
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Shifts created</CardDescription>
-            <CardTitle className="text-3xl tabular-nums">{d.shiftsCount}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/manager/calendar"
-              className="text-sm font-medium text-[var(--app-primary)] hover:underline"
-            >
-              View calendar
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Employees</CardDescription>
-            <CardTitle className="text-3xl tabular-nums">{d.employeesCount}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/manager/employees"
-              className="text-sm font-medium text-[var(--app-primary)] hover:underline"
-            >
-              Directory
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      {isError ? (
+        <>
+          <EmptyState title="Error loading data" description={`There was an error loading your dashboard data: ${error.message}`} />
+          <Button variant="secondary" onClick={() => void refetch()}>Retry</Button>
+        </>
+      ) : isLoading ? (
+        <Skeleton className="h-64 w-full rounded-xl" />
+      ) :
+        !dashboard ? (
+          <EmptyState title="No data yet" description="No dashboard data available." />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Open requests</CardDescription>
+                <CardTitle className="text-3xl tabular-nums">{dashboard.requestsCount}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link
+                  href="/manager/requests"
+                  className="text-sm font-medium text-(--app-primary) hover:underline"
+                >
+                  Review queue
+                </Link>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Shifts created</CardDescription>
+                <CardTitle className="text-3xl tabular-nums">{dashboard.shiftsCount}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link
+                  href="/manager/calendar"
+                  className="text-sm font-medium text-(--app-primary) hover:underline"
+                >
+                  View calendar
+                </Link>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Employees</CardDescription>
+                <CardTitle className="text-3xl tabular-nums">{dashboard.employeesCount}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link
+                  href="/manager/employees"
+                  className="text-sm font-medium text-(--app-primary) hover:underline"
+                >
+                  Directory
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        )}
     </div>
   );
 }
