@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, LayoutDashboard } from "lucide-react";
+import { CalendarDays, CalendarClock, LayoutDashboard } from "lucide-react";
 
 import { DashboardUserMenu } from "~/app/dashboard/_components/dashboard-user-menu";
 import { cn } from "~/lib/utils";
 
 const items = [
   { href: "/employee", label: "Overview", icon: LayoutDashboard, end: true },
+  { href: "/employee/availability", label: "Availability", icon: CalendarClock },
   { href: "/employee/calendar", label: "Shifts", icon: CalendarDays },
 ];
 

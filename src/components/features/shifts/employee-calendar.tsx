@@ -4,13 +4,16 @@ import type { EventClickArg, EventInput } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button-variants";
 import { Modal } from "~/components/ui/modal";
 import { Skeleton } from "~/components/ui/skeleton";
 import { employeeShiftColors } from "~/lib/calendar/shift-visuals";
+import { cn } from "~/lib/utils";
 import { api, type RouterOutputs } from "~/trpc/react";
 
 type EmployeeCalendarData = RouterOutputs["employee"]["shifts"]["calendar"];
@@ -115,12 +118,22 @@ export function EmployeeCalendar() {
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
           {needsAvailability
-            ? "Your manager uses weekly availability to match you with open shifts. Complete availability in your profile flow when that screen is enabled."
+            ? "Your manager uses weekly availability to match you with open shifts. Choose the days you can work on the availability page, then come back here."
             : msg}
         </p>
-        <Button type="button" className="mt-4" variant="secondary" onClick={() => void refetch()}>
-          Retry
-        </Button>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          {needsAvailability ? (
+            <Link
+              href="/employee/availability"
+              className={cn(buttonVariants({ variant: "primary", size: "md" }))}
+            >
+              Set availability
+            </Link>
+          ) : null}
+          <Button type="button" variant="secondary" onClick={() => void refetch()}>
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
