@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getSession } from "~/server/better-auth/server";
 import { LoginButton } from "~/app/_components/login-button";
+import { getSession } from "~/server/better-auth/server";
 
 export default async function LoginPage() {
   const session = await getSession();
@@ -12,25 +12,31 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="swift-shell">
-      <div className="swift-mesh" aria-hidden="true" />
+    <main className="landing-page flex min-h-screen flex-col">
+      <div className="landing-mesh" aria-hidden />
+      <div className="relative z-[1] flex flex-1 flex-col items-center justify-center px-4 py-16">
+        <section className="landing-glass w-full max-w-lg rounded-[1.75rem] border border-[var(--landing-border)] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.4)] sm:p-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">
+            Welcome back
+          </p>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            Sign in to Swift Shift
+          </h1>
+          <p className="mt-3 text-muted-foreground">
+            Manage schedules, approve requests, and keep your team aligned from one calm surface.
+          </p>
 
-      <section className="swift-hero reveal reveal-2 mx-auto max-w-2xl">
-        <p className="swift-kicker">Welcome Back</p>
-        <h1>Login to Swift Shift</h1>
-        <p className="swift-hero-copy">
-          Sign in to manage schedules, approve requests, and keep your team in
-          sync.
-        </p>
-
-        <div className="swift-hero-actions">
-          <LoginButton />
-
-          <Link href="/" className="swift-link">
-            Back to home
-          </Link>
-        </div>
-      </section>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <LoginButton />
+            <Link
+              href="/"
+              className="text-center text-sm font-medium text-muted-foreground transition hover:text-foreground sm:text-left"
+            >
+              ← Back to home
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

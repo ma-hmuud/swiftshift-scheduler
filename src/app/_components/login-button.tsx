@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { redirect } from "next/navigation";
 
-import { authClient } from "~/server/better-auth/client";
+import { buttonVariants } from "~/components/ui/button-variants";
 import { Spinner } from "~/components/ui/spinner";
+import { authClient } from "~/server/better-auth/client";
+import { cn } from "~/lib/utils";
 
 export function LoginButton() {
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ export function LoginButton() {
   return (
     <button
       type="button"
-      className="swift-button"
+      className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
       onClick={handleSignIn}
       disabled={loading}
     >

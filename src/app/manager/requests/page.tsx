@@ -107,7 +107,7 @@ export default function ManagerRequestsPage() {
                       </button>
                       <button
                         type="button"
-                        className="rounded-md bg-[var(--app-primary)] px-2 py-1 text-xs font-semibold text-[var(--app-primary-fg)] hover:opacity-90 disabled:opacity-50"
+                        className="rounded-md bg-(--app-primary) px-2 py-1 text-xs font-semibold text-(--app-primary-fg) hover:opacity-90 disabled:opacity-50"
                         disabled={reply.isPending}
                         onClick={() =>
                           reply.mutate({

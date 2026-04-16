@@ -1,30 +1,29 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Cormorant_Garamond, Manrope, Geist } from "next/font/google";
+import { DM_Sans, Fraunces } from "next/font/google";
 
 import { AppProviders } from "~/app/_components/app-providers";
 import { cn } from "~/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const sans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+});
 
-export const metadata: Metadata = {
-  title: "Swift Shift - Employee Scheduler",
-  description:
-    "Modern employee scheduling with clear workflows and faster approvals.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
-};
-
-const display = Cormorant_Garamond({
+const display = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["600", "700"],
 });
 
-const body = Manrope({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
+export const metadata: Metadata = {
+  title: "Swift Shift - Employee Scheduler",
+  description:
+    "Calendar-native employee scheduling with clear workflows and faster approvals.",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
+};
 
 const darkOnlyScript = `
 (() => {
@@ -39,13 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        display.variable,
-        body.variable,
-        "font-sans",
-        geist.variable,
-        "dark",
-      )}
+      className={cn(sans.variable, display.variable, "font-sans", "dark")}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">

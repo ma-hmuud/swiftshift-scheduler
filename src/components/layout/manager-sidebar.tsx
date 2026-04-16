@@ -30,10 +30,10 @@ export function ManagerSidebar(props: ManagerSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-full flex-col border-b border-border bg-card/90 backdrop-blur lg:fixed lg:inset-y-0 lg:w-60 lg:border-r lg:border-b-0">
+    <aside className="flex w-full flex-col border-b border-border/70 bg-card/85 backdrop-blur-md lg:fixed lg:inset-y-0 lg:w-60 lg:border-r lg:border-b-0">
       <div className="flex h-full flex-col gap-6 px-4 py-6">
         <div>
-          <p className="font-display text-lg font-semibold tracking-tight">Swift Shift</p>
+          <p className="font-display text-lg font-semibold tracking-tight text-foreground">Swift Shift</p>
           <p className="mt-1 text-xs text-muted-foreground">Manager workspace</p>
         </div>
         <DashboardUserMenu {...props} />
@@ -48,10 +48,10 @@ export function ManagerSidebar(props: ManagerSidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    ? "bg-[color-mix(in_srgb,var(--primary)_20%,transparent)] text-foreground shadow-[0_0_0_1px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
                 )}
               >
                 <Icon className="size-4 shrink-0 opacity-90" />

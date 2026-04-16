@@ -43,15 +43,15 @@ function getStatusBadgeClass(status: string) {
   switch (status) {
     case "approved":
     case "published":
-      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200";
+      return "bg-[color-mix(in_srgb,var(--olive-600)_28%,transparent)] text-[color-mix(in_srgb,var(--olive-800)_90%,white)]";
     case "pending":
     case "draft":
-      return "bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200";
+      return "bg-[color-mix(in_srgb,var(--walnut-700)_22%,transparent)] text-[var(--walnut-900)]";
     case "rejected":
     case "cancelled":
-      return "bg-rose-100 text-rose-900 dark:bg-rose-950/60 dark:text-rose-200";
+      return "bg-[color-mix(in_srgb,var(--destructive)_22%,transparent)] text-[color-mix(in_srgb,var(--destructive)_85%,white)]";
     case "filled":
-      return "bg-sky-100 text-sky-900 dark:bg-sky-950/60 dark:text-sky-200";
+      return "bg-[color-mix(in_srgb,var(--toffee-600)_22%,transparent)] text-[var(--toffee-800)]";
     default:
       return "bg-muted text-muted-foreground";
   }
@@ -68,29 +68,38 @@ function DashboardLayout(props: {
   children: ReactNode;
 }) {
   return (
-    <main className="swift-shell">
-      <div className="swift-mesh" aria-hidden="true" />
-      <section className="swift-hero reveal reveal-2">
-        <p className="swift-kicker">Dashboard</p>
-        <h1>{props.title}</h1>
-        <p className="swift-hero-copy">{props.subtitle}</p>
+    <main className="relative mx-auto w-full max-w-[1120px] px-4 py-8 sm:py-12">
+      <section className="mb-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+          Dashboard
+        </p>
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          {props.title}
+        </h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">{props.subtitle}</p>
       </section>
 
-      <section className="swift-metrics reveal reveal-3" aria-label="Dashboard metrics">
+      <section
+        className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        aria-label="Dashboard metrics"
+      >
         {props.metrics.map((metric) => (
-          <p key={metric.label}>
-            <strong>{metric.value}</strong>
-            {metric.label}
-            <span className="mt-2 block text-xs uppercase tracking-[0.18em] text-(--ink-soft)">
+          <div
+            key={metric.label}
+            className="rounded-2xl border border-(--landing-border) bg-card/90 p-5 shadow-sm ring-1 ring-white/3"
+          >
+            <p className="font-display text-3xl font-semibold tabular-nums text-foreground">
+              {metric.value}
+            </p>
+            <p className="mt-1 text-sm font-medium capitalize text-muted-foreground">{metric.label}</p>
+            <span className="mt-2 block text-xs uppercase tracking-[0.16em] text-(--ink-soft)">
               {metric.helper}
             </span>
-          </p>
+          </div>
         ))}
       </section>
 
-      <section className="mx-auto mt-6 grid w-full max-w-[1120px] gap-4 lg:grid-cols-2">
-        {props.children}
-      </section>
+      <section className="grid w-full gap-4 lg:grid-cols-2">{props.children}</section>
     </main>
   );
 }
@@ -101,12 +110,10 @@ function SectionCard(props: {
   children: ReactNode;
 }) {
   return (
-    <article className="swift-card reveal reveal-4 h-full">
+    <article className="landing-glass h-full rounded-3xl border border-(--landing-border) p-6 shadow-[0_18px_50px_rgba(0,0,0,0.22)] sm:p-8">
       <div className="mb-5">
-        <h2 className="text-3xl">{props.title}</h2>
-        <p className="mt-2 text-sm leading-6 text-(--ink-soft)">
-          {props.description}
-        </p>
+        <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{props.title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-(--ink-soft)">{props.description}</p>
       </div>
       {props.children}
     </article>

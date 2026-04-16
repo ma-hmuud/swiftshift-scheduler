@@ -46,11 +46,11 @@ export function DashboardSidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="w-full border-b border-(--line) bg-card/80 backdrop-blur lg:min-h-screen lg:w-72 lg:border-r lg:border-b-0">
+    <aside className="w-full border-b border-border/70 bg-card/85 backdrop-blur-md lg:min-h-screen lg:w-72 lg:border-r lg:border-b-0">
       <div className="sticky top-0 flex h-full flex-col px-5 py-6">
         <div className="mb-8">
-          <p className="swift-brand text-xl">Swift Shift</p>
-          <p className="mt-2 text-sm text-(--ink-soft)">
+          <p className="font-display text-xl font-semibold tracking-tight">Swift Shift</p>
+          <p className="mt-2 text-sm text-muted-foreground">
             Scheduling workspace for managers and employees.
           </p>
         </div>
@@ -79,8 +79,8 @@ export function DashboardSidebar({
                 className={cn(
                   "flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
                   isActive
-                    ? "border-transparent bg-foreground text-background"
-                    : "border-(--line) bg-transparent text-foreground hover:border-(--line) hover:bg-background/70",
+                    ? "border-[color-mix(in_srgb,var(--primary)_40%,var(--landing-border))] bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-foreground shadow-[0_0_0_1px_color-mix(in_srgb,var(--primary)_25%,transparent)]"
+                    : "border-border/60 bg-transparent text-muted-foreground hover:border-border hover:bg-muted/50 hover:text-foreground",
                 )}
               >
                 <Icon className="h-4 w-4" />
