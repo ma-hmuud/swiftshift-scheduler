@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { LoginButton } from "~/app/_components/login-button";
+import { SwiftShiftLockup } from "~/components/brand/swift-shift-lockup";
 import { getCommunityMembership } from "~/server/community/membership";
 import { getSession } from "~/server/better-auth/server";
 
@@ -18,7 +19,8 @@ export default async function LoginPage() {
       <div className="landing-mesh" aria-hidden />
       <div className="relative z-1 flex flex-1 flex-col items-center justify-center px-4 py-16">
         <section className="landing-glass w-full max-w-lg rounded-[1.75rem] border border-(--landing-border) p-8 shadow-[0_24px_80px_rgba(0,0,0,0.4)] sm:p-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+          <SwiftShiftLockup href="/" priority className="justify-center sm:justify-start" />
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
             Welcome back
           </p>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">

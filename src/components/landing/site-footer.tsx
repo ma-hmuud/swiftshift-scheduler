@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { SwiftShiftLockup } from "~/components/brand/swift-shift-lockup";
+
 const COLS = [
   {
     title: "Product",
@@ -39,7 +41,10 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)]">
           <div className="space-y-4">
-            <p className="font-display text-xl font-semibold">Swift Shift</p>
+            <SwiftShiftLockup
+              href="/"
+              className="[&_span]:text-xl [&_span]:font-semibold"
+            />
             <p className="max-w-sm text-sm text-muted-foreground">
               Calendar-native scheduling for teams who cannot afford ambiguity. Built with warm
               contrast, sharp approvals, and respect for the floor.

@@ -22,7 +22,11 @@ export const metadata: Metadata = {
   title: "Swift Shift - Employee Scheduler",
   description:
     "Calendar-native employee scheduling with clear workflows and faster approvals.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: {
+    icon: [{ url: "/logos/dark-logo.jpg", type: "image/jpeg" }],
+    apple: [{ url: "/logos/dark-logo.jpg" }],
+    shortcut: "/logos/dark-logo.jpg",
+  },
 };
 
 const darkOnlyScript = `

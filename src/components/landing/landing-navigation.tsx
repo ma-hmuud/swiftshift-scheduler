@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { SwiftShiftLockup } from "~/components/brand/swift-shift-lockup";
 import { LandingUserMenu } from "~/components/landing/landing-user-menu";
 import { buttonVariants } from "~/components/ui/button-variants";
 import { cn } from "~/lib/utils";
@@ -23,12 +24,7 @@ type LandingNavigationProps = {
 export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
   return (
     <header className="landing-nav fixed inset-x-0 top-4 z-50 mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-3 sm:px-4">
-      <Link
-        href="/"
-        className="font-display text-lg font-semibold tracking-tight text-foreground"
-      >
-        Swift Shift
-      </Link>
+      <SwiftShiftLockup href="/" priority className="shrink-0" />
 
       <nav
         className="order-last flex w-full justify-center sm:order-0 sm:flex-1 sm:w-auto"

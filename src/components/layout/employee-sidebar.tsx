@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { CalendarDays, CalendarClock, LayoutDashboard } from "lucide-react";
 
 import { DashboardUserMenu } from "~/app/dashboard/_components/dashboard-user-menu";
+import { SwiftShiftLockup } from "~/components/brand/swift-shift-lockup";
 import { cn } from "~/lib/utils";
 
 const items = [
@@ -27,8 +28,8 @@ export function EmployeeSidebar(props: EmployeeSidebarProps) {
     <aside className="flex w-full flex-col border-b border-border/70 bg-card/85 backdrop-blur-md lg:fixed lg:inset-y-0 lg:w-56 lg:border-r lg:border-b-0">
       <div className="flex h-full flex-col gap-6 px-4 py-6">
         <div>
-          <p className="font-display text-lg font-semibold tracking-tight text-foreground">Swift Shift</p>
-          <p className="mt-1 text-xs text-muted-foreground">Team member</p>
+          <SwiftShiftLockup href="/employee" />
+          <p className="mt-2 text-xs text-muted-foreground">Team member</p>
         </div>
         <DashboardUserMenu {...props} />
         <nav className="grid gap-1" aria-label="Employee">
