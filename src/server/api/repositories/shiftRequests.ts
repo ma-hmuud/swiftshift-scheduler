@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { db } from "~/server/db";
 import { shiftRequests, shifts, user } from "~/server/db/schema";
 
@@ -13,6 +13,51 @@ export const getManagerShiftsRequestsDb = async (
     .where(
       and(eq(shiftRequests.shiftId, shiftId), eq(shifts.managerId, managerId)),
     );
+};
+
+/** Approved employees currently assigned to a shift (manager-owned). */
+export const getApprovedAssignmentsForShiftDb = async (
+  shiftId: number,
+  managerId: number,
+) => {
+  return db
+    .select({
+      requestId: shiftRequests.id,
+      employeeId: shiftRequests.employeeId,
+      employeeName: user.name,
+      employeeEmail: user.email,
+    })
+    .from(shiftRequests)
+    .innerJoin(shifts, eq(shiftRequests.shiftId, shifts.id))
+    .innerJoin(user, eq(shiftRequests.employeeId, user.id))
+    .where(
+      and(
+        eq(shiftRequests.shiftId, shiftId),
+        eq(shifts.managerId, managerId),
+        eq(shiftRequests.status, "approved"),
+      ),
+    )
+    .orderBy(asc(user.name));
+};
+
+/** Removes an employee from a shift by deleting the shift request (manager must own the shift). */
+export const deleteShiftRequestByManagerDb = async (
+  requestId: number,
+  managerId: number,
+) => {
+  const found = await db
+    .select({ id: shiftRequests.id })
+    .from(shiftRequests)
+    .innerJoin(shifts, eq(shiftRequests.shiftId, shifts.id))
+    .where(
+      and(eq(shiftRequests.id, requestId), eq(shifts.managerId, managerId)),
+    )
+    .limit(1);
+
+  if (!found[0]) return null;
+
+  await db.delete(shiftRequests).where(eq(shiftRequests.id, requestId));
+  return { id: requestId };
 };
 
 export const replyToShiftRequestDb = async (

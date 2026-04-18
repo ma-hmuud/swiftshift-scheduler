@@ -4,7 +4,9 @@ import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
 import { tryCatch } from "~/lib/utils/try-catch";
 import {
+  deleteShiftRequestByManagerDb,
   getAllShiftRequestsForManagerDb,
+  getApprovedAssignmentsForShiftDb,
   getEmployeeShiftRequestsDb,
   getManagerShiftsRequestsDb,
   replyToShiftRequestDb,
@@ -57,6 +59,60 @@ export const shiftRequestsGetAllProc = managerProcedure
     }
 
     return { ok: true, data: shiftRequests };
+  });
+
+export const shiftRequestsListApprovedForShiftProc = managerProcedure
+  .input(
+    z.object({
+      shiftId: z.number().int().positive("Shift ID must be positive"),
+    }),
+  )
+  .query(async ({ input, ctx }) => {
+    const { shiftId } = input;
+    const managerId = Number(ctx.session.user.id);
+
+    const { data, error } = await tryCatch(
+      getApprovedAssignmentsForShiftDb(shiftId, managerId),
+    );
+    if (error) {
+      console.error("Error loading shift assignments:", error.message);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to load assigned employees",
+      });
+    }
+
+    return { ok: true as const, data };
+  });
+
+export const shiftRequestsRemoveAssignmentProc = managerProcedure
+  .input(
+    z.object({
+      requestId: z.number().int().positive("Request ID must be positive"),
+    }),
+  )
+  .mutation(async ({ input, ctx }) => {
+    const managerId = Number(ctx.session.user.id);
+
+    const { data, error } = await tryCatch(
+      deleteShiftRequestByManagerDb(input.requestId, managerId),
+    );
+    if (error) {
+      console.error("Error removing assignment:", error.message);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to remove employee from shift",
+      });
+    }
+
+    if (!data) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Assignment not found or you do not have permission to remove it",
+      });
+    }
+
+    return { ok: true as const, data };
   });
 
 export const shiftRequestsReplyProc = managerProcedure

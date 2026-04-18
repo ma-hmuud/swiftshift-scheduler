@@ -26,6 +26,23 @@ export function ManagerShiftDetailModal({
 }: ManagerShiftDetailModalProps) {
   const utils = api.useUtils();
 
+  const assignmentsQuery = api.manager.shiftRequests.listApprovedForShift.useQuery(
+    { shiftId: shift?.id ?? 0 },
+    { enabled: open && Boolean(shift?.id) },
+  );
+
+  const removeAssignment = api.manager.shiftRequests.removeAssignment.useMutation({
+    onSuccess: async () => {
+      toast.success("Employee removed from shift");
+      await Promise.all([
+        utils.manager.shifts.list.invalidate(),
+        utils.manager.shiftRequests.listApprovedForShift.invalidate(),
+        utils.manager.shiftRequests.listAll.invalidate(),
+      ]);
+    },
+    onError: (e) => toast.error(e.message ?? "Could not remove employee"),
+  });
+
   const [title, setTitle] = useState("");
   const [startLocal, setStartLocal] = useState("");
   const [endLocal, setEndLocal] = useState("");
@@ -183,6 +200,48 @@ export function ManagerShiftDetailModal({
             <option value="filled">Filled</option>
           </select>
         </label>
+
+        <div className="rounded-xl border border-border bg-muted/30 p-4">
+          <h3 className="text-sm font-semibold text-foreground">Assigned employees</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Approved coverage for this shift. Removing someone frees a seat and removes their booking.
+          </p>
+          {assignmentsQuery.isLoading ? (
+            <p className="mt-3 text-sm text-muted-foreground">Loading…</p>
+          ) : assignmentsQuery.isError ? (
+            <p className="mt-3 text-sm text-destructive">Could not load assignments.</p>
+          ) : (assignmentsQuery.data?.data?.length ?? 0) === 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">No approved employees yet.</p>
+          ) : (
+            <ul className="mt-3 divide-y divide-border rounded-lg border border-border bg-background">
+              {(assignmentsQuery.data?.data ?? []).map((row) => (
+                <li
+                  key={row.requestId}
+                  className="flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">{row.employeeName}</p>
+                    <p className="truncate text-xs text-muted-foreground">{row.employeeEmail}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    loading={removeAssignment.isPending}
+                    disabled={removeAssignment.isPending}
+                    onClick={() =>
+                      removeAssignment.mutate({
+                        requestId: row.requestId,
+                      })
+                    }
+                  >
+                    Remove from shift
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </form>
     </Modal>
   );
