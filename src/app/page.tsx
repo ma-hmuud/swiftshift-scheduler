@@ -28,24 +28,26 @@ export default async function Home() {
               : null
           }
         />
-        <RevealSection className="w-full">
-          <LandingHero signedIn={signedIn} />
-        </RevealSection>
-        <RevealSection className="w-full">
-          <FeaturePillars />
-        </RevealSection>
-        <RevealSection className="w-full">
-          <FeatureOrbitSection />
-        </RevealSection>
-        <RevealSection className="w-full">
-          <CommunityBand />
-        </RevealSection>
-        <RevealSection className="w-full">
-          <TestimonialRow />
-        </RevealSection>
-        <RevealSection className="w-full">
-          <SiteFooter />
-        </RevealSection>
+        <div className="landing-content">
+          <RevealSection className="w-full">
+            <LandingHero signedIn={signedIn} />
+          </RevealSection>
+          <RevealSection className="w-full">
+            <FeaturePillars />
+          </RevealSection>
+          <RevealSection className="w-full">
+            <FeatureOrbitSection />
+          </RevealSection>
+          <RevealSection className="w-full">
+            <CommunityBand />
+          </RevealSection>
+          <RevealSection className="w-full">
+            <TestimonialRow />
+          </RevealSection>
+          <RevealSection className="w-full">
+            <SiteFooter />
+          </RevealSection>
+        </div>
       </div>
     </main>
   );

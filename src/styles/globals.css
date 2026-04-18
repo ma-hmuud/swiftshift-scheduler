@@ -138,7 +138,18 @@ body {
 .landing-page {
   position: relative;
   min-height: 100vh;
+}
+
+/* Horizontal clip below the fixed nav; top padding reserves space (nav height varies by breakpoint). */
+.landing-content {
   overflow-x: hidden;
+  padding-top: calc(1rem + 6.75rem);
+}
+
+@media (min-width: 640px) {
+  .landing-content {
+    padding-top: calc(1rem + 4.75rem);
+  }
 }
 
 .landing-mesh {

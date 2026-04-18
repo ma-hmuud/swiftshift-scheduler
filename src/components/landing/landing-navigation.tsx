@@ -22,7 +22,7 @@ type LandingNavigationProps = {
 
 export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
   return (
-    <header className="landing-nav sticky top-4 z-50 mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-3 sm:px-4">
+    <header className="landing-nav fixed inset-x-0 top-4 z-50 mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-3 sm:px-4">
       <Link
         href="/"
         className="font-display text-lg font-semibold tracking-tight text-foreground"
