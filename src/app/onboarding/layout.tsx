@@ -19,7 +19,7 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
     <div className="min-h-screen bg-background">
       <main className="landing-page flex min-h-screen flex-col">
         <div className="landing-mesh" aria-hidden />
-        <div className="relative z-[1] flex flex-1 flex-col">{children}</div>
+        <div className="relative z-1 flex flex-1 flex-col">{children}</div>
       </main>
     </div>
   );

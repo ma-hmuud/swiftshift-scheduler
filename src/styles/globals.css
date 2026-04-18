@@ -143,12 +143,13 @@ body {
 /* Horizontal clip below the fixed nav; top padding reserves space (nav height varies by breakpoint). */
 .landing-content {
   overflow-x: hidden;
-  padding-top: calc(1rem + 6.75rem);
+  /* Single-row bar on mobile (sections live in a dropdown). */
+  padding-top: calc(1rem + max(0.75rem, env(safe-area-inset-top)) + 5.25rem);
 }
 
 @media (min-width: 640px) {
   .landing-content {
-    padding-top: calc(1rem + 4.75rem);
+    padding-top: calc(1rem + max(1rem, env(safe-area-inset-top)) + 4.75rem);
   }
 }
 
@@ -190,6 +191,8 @@ body {
   border: 1px solid var(--landing-border);
   background: color-mix(in srgb, var(--card) 82%, transparent);
   padding: 0.5rem 0.75rem;
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
   backdrop-filter: blur(16px);
   box-shadow:
     0 18px 50px rgba(0, 0, 0, 0.35),
