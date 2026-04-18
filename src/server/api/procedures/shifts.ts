@@ -22,7 +22,10 @@ import {
   listNonCancelledShiftsForOverlapDb,
   updateShiftDb,
 } from "../repositories/shifts";
-import { getEmployeeShiftRequestsDb } from "../repositories/shiftRequests";
+import {
+  countApprovedAssignmentsForShiftDb,
+  getEmployeeShiftRequestsDb,
+} from "../repositories/shiftRequests";
 import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
 
@@ -195,6 +198,27 @@ export const shiftsUpdateProc = managerProcedure
           message: `This time range overlaps another shift: ${overlappingTitles.map((t) => `"${t}"`).join(", ")}. Change the times or cancel the other shift first.`,
         });
       }
+    }
+
+    const mergedMaxEmployees =
+      newShift.maxEmployees ?? existing.maxEmployees;
+
+    const { data: approvedCount, error: approvedCountError } = await tryCatch(
+      countApprovedAssignmentsForShiftDb(shiftId, Number(managerId)),
+    );
+    if (approvedCountError) {
+      console.error("Error counting shift assignments:", approvedCountError.message);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to validate shift capacity",
+      });
+    }
+
+    if (mergedMaxEmployees < approvedCount) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Capacity (${mergedMaxEmployees}) cannot be lower than the number of employees already approved for this shift (${approvedCount}). Remove employees from the shift first, then lower capacity.`,
+      });
     }
 
     const { data: updatedShift, error: updatedShiftError } = await tryCatch(

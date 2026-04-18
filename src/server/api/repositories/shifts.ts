@@ -71,6 +71,7 @@ export const getManagerShiftRowDb = async (shiftId: number, managerId: number) =
       title: shifts.title,
       startTime: shifts.startTime,
       endTime: shifts.endTime,
+      maxEmployees: shifts.maxEmployees,
       status: shifts.status,
     })
     .from(shifts)

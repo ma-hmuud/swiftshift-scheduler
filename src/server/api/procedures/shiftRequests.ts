@@ -4,11 +4,13 @@ import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
 import { tryCatch } from "~/lib/utils/try-catch";
 import {
+  countApprovedAssignmentsForShiftDb,
   deleteShiftRequestByManagerDb,
   getAllShiftRequestsForManagerDb,
   getApprovedAssignmentsForShiftDb,
   getEmployeeShiftRequestsDb,
   getManagerShiftsRequestsDb,
+  getShiftRequestReplyContextDb,
   replyToShiftRequestDb,
   sendShiftRequestDb,
 } from "../repositories/shiftRequests";
@@ -127,10 +129,49 @@ export const shiftRequestsReplyProc = managerProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { shiftRequestId, status } = input;
-    const { id: managerId } = ctx.session.user;
+    const managerIdNum = Number(ctx.session.user.id);
+
+    if (status === "approved") {
+      const { data: replyCtx, error: ctxError } = await tryCatch(
+        getShiftRequestReplyContextDb(shiftRequestId, managerIdNum),
+      );
+      if (ctxError) {
+        console.error("Error loading shift request:", ctxError.message);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to validate approval",
+        });
+      }
+      if (!replyCtx) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "Shift request not found or you do not have permission to reply to it",
+        });
+      }
+
+      if (replyCtx.requestStatus !== "approved") {
+        const { data: approvedCount, error: countError } = await tryCatch(
+          countApprovedAssignmentsForShiftDb(replyCtx.shiftId, managerIdNum),
+        );
+        if (countError) {
+          console.error("Error counting approvals:", countError.message);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to validate shift capacity",
+          });
+        }
+        if (approvedCount >= replyCtx.maxEmployees) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: `This shift is at capacity (${replyCtx.maxEmployees} approved). Increase capacity or remove an employee before approving this request.`,
+          });
+        }
+      }
+    }
 
     const { data: shiftRequests, error: shiftRequestsError } = await tryCatch(
-      replyToShiftRequestDb(shiftRequestId, status, Number(managerId)),
+      replyToShiftRequestDb(shiftRequestId, status, managerIdNum),
     );
     if (shiftRequestsError) {
       console.error("Error fetching shift requests:", shiftRequestsError);
