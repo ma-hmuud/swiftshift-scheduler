@@ -4,6 +4,7 @@ import type { EventClickArg, EventInput } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dynamic from "next/dynamic";
+import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -29,7 +30,7 @@ type EmployeeShiftRow = NonNullable<
 
 export function EmployeeCalendar() {
   const utils = api.useUtils();
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isError, error, refetch, isFetching } =
     api.employee.shifts.calendar.useQuery(undefined, {
       retry: false,
     });
@@ -144,6 +145,23 @@ export function EmployeeCalendar() {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">Tap an event for details and to request a shift.</p>
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold shadow-sm hover:bg-muted/60 disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={() => void refetch()}
+          disabled={isFetching}
+          aria-busy={isFetching}
+        >
+          <RefreshCw
+            className={cn("size-4 shrink-0", isFetching && "animate-spin")}
+            aria-hidden
+          />
+          Refresh
+        </button>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm">
         {isLoading ? (
           <Skeleton className="h-[min(70vh,720px)] w-full rounded-lg" />

@@ -10,11 +10,13 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dynamic from "next/dynamic";
+import { RefreshCw } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Skeleton } from "~/components/ui/skeleton";
 import { managerCapacityColors } from "~/lib/calendar/shift-visuals";
+import { cn } from "~/lib/utils";
 import { api, type RouterOutputs } from "~/trpc/react";
 
 import { CreateShiftModal } from "./create-shift-modal";
@@ -31,7 +33,8 @@ type ManagerShiftRow = NonNullable<
 
 export function ManagerCalendar() {
   const utils = api.useUtils();
-  const { data, isLoading, isError, error } = api.manager.shifts.list.useQuery();
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    api.manager.shifts.list.useQuery();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [createRange, setCreateRange] = useState<{
@@ -162,18 +165,30 @@ export function ManagerCalendar() {
         <p className="text-sm text-muted-foreground">
           Drag on the grid to create · Drag events to reschedule · Pull handles to adjust duration
         </p>
-        <button
-          type="button"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold shadow-sm hover:bg-muted/60"
-          onClick={() => {
-            const start = new Date();
-            start.setMinutes(0, 0, 0);
-            const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);
-            openCreateWithRange(start, end);
-          }}
-        >
-          New shift
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold shadow-sm hover:bg-muted/60 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={() => void refetch()}
+            disabled={isFetching}
+            aria-busy={isFetching}
+          >
+            <RefreshCw className={cn("size-4 shrink-0", isFetching && "animate-spin")} aria-hidden />
+            Refresh
+          </button>
+          <button
+            type="button"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold shadow-sm hover:bg-muted/60"
+            onClick={() => {
+              const start = new Date();
+              start.setMinutes(0, 0, 0);
+              const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);
+              openCreateWithRange(start, end);
+            }}
+          >
+            New shift
+          </button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm">
