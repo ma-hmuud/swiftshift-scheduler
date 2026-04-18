@@ -1,10 +1,18 @@
-import { tryCatch } from "~/lib/utils/try-catch";
-import { listEmployeesDb } from "../repositories/employees";
-import { managerProcedure } from "./manager";
 import { TRPCError } from "@trpc/server";
 
-export const employeesListProc = managerProcedure.query(async () => {
-  const { data, error } = await tryCatch(listEmployeesDb());
+import { tryCatch } from "~/lib/utils/try-catch";
+import { getCommunityIdForUser } from "~/server/api/repositories/community";
+import { listEmployeesDb } from "../repositories/employees";
+import { managerProcedure } from "./manager";
+
+export const employeesListProc = managerProcedure.query(async ({ ctx }) => {
+  const managerId = Number(ctx.session.user.id);
+  const communityId = await getCommunityIdForUser(managerId);
+  if (!communityId) {
+    return { ok: true as const, data: [] };
+  }
+
+  const { data, error } = await tryCatch(listEmployeesDb(communityId));
 
   if (error) {
     console.error("Error listing employees:", error.message);
@@ -14,5 +22,5 @@ export const employeesListProc = managerProcedure.query(async () => {
     });
   }
 
-  return { ok: true, data };
+  return { ok: true as const, data };
 });

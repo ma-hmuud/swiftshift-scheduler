@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -8,7 +7,6 @@ import {
   bigint,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { shiftRequests, shifts } from "./shift";
 
 export const user = pgTable("user", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
@@ -97,35 +95,3 @@ export const availability = pgTable("availability", {
     .notNull(),
 });
 
-// Relations
-export const userRelations = relations(user, ({ many, one }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  shifts: many(shifts),
-  availability: one(availability, {
-    fields: [user.id],
-    references: [availability.employeeId],
-  }),
-  shiftRequests: many(shiftRequests),
-}));
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}));
-
-export const availabilityRelations = relations(availability, ({ one }) => ({
-  employee: one(user, {
-    fields: [availability.employeeId],
-    references: [user.id],
-  }),
-}));

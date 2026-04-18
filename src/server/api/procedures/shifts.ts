@@ -11,6 +11,7 @@ import { isShiftStillOpen } from "~/lib/shifts/time";
 import { tryCatch } from "~/lib/utils/try-catch";
 import { getAvailabilityDb } from "../repositories/availability";
 import { getManagerByIdDb } from "../repositories/manager";
+import { getCommunityIdForUser } from "~/server/api/repositories/community";
 import {
   createShiftDb,
   deleteShiftDb,
@@ -37,9 +38,10 @@ function findOverlappingShiftTitles(
     .map((row) => row.title);
 }
 
-export const shiftsGetAllProc = managerProcedure.query(async () => {
+export const shiftsGetAllProc = managerProcedure.query(async ({ ctx }) => {
+  const managerId = Number(ctx.session.user.id);
   const { data, error } = await tryCatch(
-    Promise.all([getAllShiftsDb(), getApprovedBookingCountsDb()]),
+    Promise.all([getAllShiftsDb(managerId), getApprovedBookingCountsDb()]),
   );
 
   if (error) {
@@ -66,7 +68,15 @@ export const shiftsCreateProc = managerProcedure
   .input(createShiftClientSchema)
   .mutation(async ({ ctx, input }) => {
     const managerId = Number(ctx.session.user.id);
-    const payload = createShiftSchema.parse({ ...input, managerId });
+    const communityId = await getCommunityIdForUser(managerId);
+    if (!communityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Create or join a community before creating shifts.",
+      });
+    }
+
+    const payload = createShiftSchema.parse({ ...input, managerId, communityId });
 
     const { data: manager, error: managerError } = await tryCatch(
       getManagerByIdDb(managerId),
@@ -257,10 +267,18 @@ export const shiftsCalendarForEmployeeProc = employeeProcedure.query(
   async ({ ctx }) => {
     const employeeId = Number(ctx.session.user.id);
 
+    const communityId = await getCommunityIdForUser(employeeId);
+    if (!communityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Join a community with an invite code before viewing shifts.",
+      });
+    }
+
     const { data, error } = await tryCatch(
       Promise.all([
         getAvailabilityDb(employeeId),
-        getPublishedShiftsWithManagerDb(),
+        getPublishedShiftsWithManagerDb(communityId),
         getApprovedBookingCountsDb(),
         getEmployeeShiftRequestsDb(employeeId),
       ]),

@@ -8,6 +8,13 @@
       "when": 1770701998966,
       "tag": "0000_harsh_magma",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776549774038,
+      "tag": "0001_community",
+      "breakpoints": true
     }
   ]
 }

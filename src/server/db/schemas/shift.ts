@@ -1,12 +1,16 @@
-import { bigint, pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { bigint, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import { community } from "./community";
 import { user } from "./user";
-import { relations } from "drizzle-orm";
 
 export const shifts = pgTable("shifts", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
   managerId: bigint("manager_id", { mode: "number" })
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
+  communityId: bigint("community_id", { mode: "number" }).references(() => community.id, {
+    onDelete: "cascade",
+  }),
   title: text("title").notNull(),
   startTime: text("start_time").notNull(),
   endTime: text("end_time").notNull(),
@@ -35,22 +39,3 @@ export const shiftRequests = pgTable("shift_requests", {
     .notNull(),
 });
 
-// Relations
-export const shiftRelations = relations(shifts, ({ one, many }) => ({
-  manager: one(user, {
-    fields: [shifts.managerId],
-    references: [user.id],
-  }),
-  shiftRequests: many(shiftRequests),
-}));
-
-export const shiftRequestRelations = relations(shiftRequests, ({ one }) => ({
-  shift: one(shifts, {
-    fields: [shiftRequests.shiftId],
-    references: [shifts.id],
-  }),
-  employee: one(user, {
-    fields: [shiftRequests.employeeId],
-    references: [user.id],
-  }),
-}));

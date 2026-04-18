@@ -1,10 +1,11 @@
 import "server-only";
 
-import { count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 
 import { isShiftStillOpen } from "~/lib/shifts/time";
+import { getCommunityIdForUser } from "~/server/api/repositories/community";
 import { db } from "~/server/db";
-import { shiftRequests, shifts, user } from "~/server/db/schema";
+import { communityMember, shiftRequests, shifts, user } from "~/server/db/schema";
 
 const DASHBOARD_LIST_LIMIT = 5;
 
@@ -60,6 +61,8 @@ const matchesAvailability = (
 export const getManagerDashboardData = async (
   managerId: number,
 ): Promise<ManagerDashboardData> => {
+  const communityId = await getCommunityIdForUser(managerId);
+
   const [
     recentRequests,
     recentShifts,
@@ -109,12 +112,19 @@ export const getManagerDashboardData = async (
       })
       .from(shifts)
       .where(eq(shifts.managerId, managerId)),
-    db
-      .select({
-        count: count(user.id),
-      })
-      .from(user)
-      .where(eq(user.role, "employee")),
+    communityId
+      ? db
+          .select({
+            count: count(communityMember.userId),
+          })
+          .from(communityMember)
+          .where(
+            and(
+              eq(communityMember.communityId, communityId),
+              eq(communityMember.role, "employee"),
+            ),
+          )
+      : Promise.resolve([{ count: 0 }]),
   ]);
 
   return {
@@ -129,6 +139,8 @@ export const getManagerDashboardData = async (
 export const getEmployeeDashboardData = async (
   employeeId: number,
 ): Promise<EmployeeDashboardData> => {
+  const communityId = await getCommunityIdForUser(employeeId);
+
   const [recentRequests, requestsCountResult, availabilityRecord, publishedShifts] =
     await Promise.all([
       db
@@ -158,14 +170,18 @@ export const getEmployeeDashboardData = async (
           daysOfWeek: true,
         },
       }),
-      db
-        .select({
-          id: shifts.id,
-          startTime: shifts.startTime,
-          endTime: shifts.endTime,
-        })
-        .from(shifts)
-        .where(eq(shifts.status, "published")),
+      communityId
+        ? db
+            .select({
+              id: shifts.id,
+              startTime: shifts.startTime,
+              endTime: shifts.endTime,
+            })
+            .from(shifts)
+            .where(
+              and(eq(shifts.status, "published"), eq(shifts.communityId, communityId)),
+            )
+        : Promise.resolve([]),
     ]);
 
   const availabilityDays =

@@ -1,4 +1,6 @@
 import z from "zod";
+import { getCommunityIdForUser } from "~/server/api/repositories/community";
+import { employeeProcedure } from "./employee";
 import { managerProcedure } from "./manager";
 import { tryCatch } from "~/lib/utils/try-catch";
 import {
@@ -9,7 +11,6 @@ import {
   sendShiftRequestDb,
 } from "../repositories/shiftRequests";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure } from "../trpc";
 import { hasShiftEnded } from "~/lib/shifts/time";
 import { getAvailabilityDb } from "../repositories/availability";
 import { getOneShiftDb } from "../repositories/shifts";
@@ -95,7 +96,7 @@ export const shiftRequestsReplyProc = managerProcedure
   });
 
 // Employee proces
-export const shiftRequestsEmployeeProc = protectedProcedure.query(
+export const shiftRequestsEmployeeProc = employeeProcedure.query(
   async ({ ctx }) => {
     const { id: employeeId } = ctx.session.user;
 
@@ -118,7 +119,7 @@ export const shiftRequestsEmployeeProc = protectedProcedure.query(
   },
 );
 
-export const shiftRequestsSendProc = protectedProcedure
+export const shiftRequestsSendProc = employeeProcedure
   .input(
     z.object({
       shiftId: z.number().int().positive("Shift ID must be positive"),
@@ -126,15 +127,20 @@ export const shiftRequestsSendProc = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { shiftId } = input;
-    const { id: employeeId } = ctx.session.user;
+    const employeeIdNum = Number(ctx.session.user.id);
+
+    const communityId = await getCommunityIdForUser(employeeIdNum);
+    if (!communityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Join a community before requesting shifts.",
+      });
+    }
 
     // get availability for employee and the shift time to check if the employee is available for that shift before sending the request
 
     const { data, error } = await tryCatch(
-      Promise.all([
-        getAvailabilityDb(Number(employeeId)),
-        getOneShiftDb(shiftId),
-      ]),
+      Promise.all([getAvailabilityDb(employeeIdNum), getOneShiftDb(shiftId)]),
     );
     if (error) {
       console.error(
@@ -163,6 +169,13 @@ export const shiftRequestsSendProc = protectedProcedure
       });
     }
 
+    if (shift.communityId == null || shift.communityId !== communityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "This shift is not available in your community.",
+      });
+    }
+
     if (hasShiftEnded(shift.endTime)) {
       throw new TRPCError({
         code: "BAD_REQUEST",
@@ -187,7 +200,7 @@ export const shiftRequestsSendProc = protectedProcedure
     }
 
     const { data: shiftRequest, error: sendRequestError } = await tryCatch(
-      sendShiftRequestDb(Number(employeeId), shiftId),
+      sendShiftRequestDb(employeeIdNum, shiftId),
     );
 
     if (sendRequestError && !shiftRequest) {

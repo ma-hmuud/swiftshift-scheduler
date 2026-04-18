@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AppShellHeader } from "~/components/layout/app-shell-header";
 import { EmployeeSidebar } from "~/components/layout/employee-sidebar";
+import { getCommunityMembership } from "~/server/community/membership";
 import { getSession } from "~/server/better-auth/server";
 
 export default async function EmployeeLayout({
@@ -15,6 +16,12 @@ export default async function EmployeeLayout({
   if (!session) {
     redirect("/login");
   }
+
+  const membership = await getCommunityMembership(Number(session.user.id));
+  if (!membership) {
+    redirect("/onboarding");
+  }
+
   if (session.user.role !== "employee") {
     redirect("/manager");
   }

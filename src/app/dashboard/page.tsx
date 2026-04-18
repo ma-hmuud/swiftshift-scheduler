@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { getCommunityMembership } from "~/server/community/membership";
 import { getSession } from "~/server/better-auth/server";
 
 export default async function DashboardRedirectPage() {
@@ -9,6 +10,11 @@ export default async function DashboardRedirectPage() {
     redirect("/login");
   }
 
+  const membership = await getCommunityMembership(Number(session.user.id));
+  if (!membership) {
+    redirect("/onboarding");
+  }
+
   if (session.user.role === "manager") {
     redirect("/manager");
   }
@@ -16,5 +22,5 @@ export default async function DashboardRedirectPage() {
     redirect("/employee");
   }
 
-  redirect("/login");
+  redirect("/onboarding");
 }

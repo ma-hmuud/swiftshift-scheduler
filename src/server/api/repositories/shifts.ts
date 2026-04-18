@@ -3,7 +3,7 @@ import type { ShiftInput, UpdateShiftInput } from "~/lib/schemas/shifts";
 import { db } from "~/server/db";
 import { shiftRequests, shifts, user } from "~/server/db/schema";
 
-export const getAllShiftsDb = async () => {
+export const getAllShiftsDb = async (managerId: number) => {
   return db
     .select({
       id: shifts.id,
@@ -18,7 +18,8 @@ export const getAllShiftsDb = async () => {
       managerName: user.name,
     })
     .from(shifts)
-    .innerJoin(user, eq(shifts.managerId, user.id));
+    .innerJoin(user, eq(shifts.managerId, user.id))
+    .where(eq(shifts.managerId, managerId));
 };
 
 export const getApprovedBookingCountsDb = async () => {
@@ -32,7 +33,7 @@ export const getApprovedBookingCountsDb = async () => {
     .groupBy(shiftRequests.shiftId);
 };
 
-export const getPublishedShiftsWithManagerDb = async () => {
+export const getPublishedShiftsWithManagerDb = async (communityId: number) => {
   return db
     .select({
       id: shifts.id,
@@ -46,7 +47,9 @@ export const getPublishedShiftsWithManagerDb = async () => {
     })
     .from(shifts)
     .innerJoin(user, eq(shifts.managerId, user.id))
-    .where(eq(shifts.status, "published"));
+    .where(
+      and(eq(shifts.status, "published"), eq(shifts.communityId, communityId)),
+    );
 };
 
 export const getManagerShiftDb = async (shiftId: number, managerId: number) => {
@@ -102,6 +105,7 @@ export const getOneShiftDb = async (shiftId: number) => {
       startTime: shifts.startTime,
       endTime: shifts.endTime,
       status: shifts.status,
+      communityId: shifts.communityId,
     })
     .from(shifts)
     .where(and(eq(shifts.id, shiftId), eq(shifts.status, "published")))
