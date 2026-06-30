@@ -36,7 +36,7 @@ export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
       className={cn(
         "landing-nav",
         "fixed z-50 mx-auto max-w-6xl max-sm:px-2! max-sm:py-2!",
-        "left-3 right-3 top-[max(0.75rem,env(safe-area-inset-top))] w-auto sm:left-4 sm:right-4 sm:top-[max(1rem,env(safe-area-inset-top))]",
+        "top-[max(0.75rem,env(safe-area-inset-top))] right-3 left-3 w-auto sm:top-[max(1rem,env(safe-area-inset-top))] sm:right-4 sm:left-4",
         "flex items-center justify-between gap-2 sm:gap-3 md:gap-4",
       )}
     >
@@ -45,7 +45,7 @@ export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
         priority
         className={cn(
           "min-w-0 shrink",
-          "max-sm:[&_img]:size-8 max-sm:[&_span]:text-base max-sm:gap-2",
+          "max-sm:gap-2 max-sm:[&_img]:size-8 max-sm:[&_span]:text-base",
         )}
       />
 
@@ -58,7 +58,7 @@ export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
             <li key={l.href}>
               <a
                 href={l.href}
-                className="inline-block rounded-full px-3 py-1.5 text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
+                className="text-muted-foreground hover:bg-muted/80 hover:text-foreground inline-block rounded-full px-3 py-1.5 transition"
               >
                 {l.label}
               </a>
@@ -72,10 +72,10 @@ export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
           <DropdownMenuTrigger
             type="button"
             className={cn(
-              "flex sm:hidden items-center gap-1.5 rounded-full border border-(--landing-border)",
-              "bg-[color-mix(in_srgb,var(--card)_75%,transparent)] px-2.5 py-2 text-sm font-medium text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md",
-              "outline-none transition hover:bg-muted/80 hover:text-foreground",
-              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "flex items-center gap-1.5 rounded-full border border-(--landing-border) sm:hidden",
+              "text-muted-foreground bg-[color-mix(in_srgb,var(--card)_75%,transparent)] px-2.5 py-2 text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md",
+              "hover:bg-muted/80 hover:text-foreground transition outline-none",
+              "focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2",
             )}
             aria-label="Page sections"
           >
@@ -86,10 +86,14 @@ export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
           <DropdownMenuContent
             align="end"
             sideOffset={8}
-            className="z-100 min-w-48 border-(--landing-border) bg-popover/95 p-1.5 shadow-lg backdrop-blur-md"
+            className="bg-popover/95 z-100 min-w-48 border-(--landing-border) p-1.5 shadow-lg backdrop-blur-md"
           >
             {LINKS.map((l) => (
-              <DropdownMenuItem key={l.href} asChild className="cursor-pointer rounded-md px-3 py-2.5">
+              <DropdownMenuItem
+                key={l.href}
+                asChild
+                className="cursor-pointer rounded-md px-3 py-2.5"
+              >
                 <a href={l.href}>{l.label}</a>
               </DropdownMenuItem>
             ))}
@@ -107,7 +111,7 @@ export function LandingNavigation({ signedIn, user }: LandingNavigationProps) {
           <>
             <Link
               href="/login"
-              className="hidden rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline-flex sm:px-4"
+              className="text-muted-foreground hover:text-foreground hidden rounded-full px-3 py-2 text-sm font-medium transition sm:inline-flex sm:px-4"
             >
               Sign in
             </Link>
