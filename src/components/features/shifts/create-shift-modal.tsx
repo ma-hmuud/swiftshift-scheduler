@@ -4,8 +4,19 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
+import { DateTimeField } from "~/components/ui/datetime-field";
 import { Modal } from "~/components/ui/modal";
-import { datetimeLocalToIso, isoToDatetimeLocalValue } from "~/lib/datetime/local-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import {
+  datetimeLocalToIso,
+  isoToDatetimeLocalValue,
+} from "~/lib/datetime/local-input";
 import { api } from "~/trpc/react";
 
 type CreateShiftModalProps = {
@@ -96,70 +107,78 @@ export function CreateShiftModal({
           >
             Cancel
           </Button>
-          <Button type="submit" form="create-shift-form" loading={create.isPending}>
+          <Button
+            type="submit"
+            form="create-shift-form"
+            loading={create.isPending}
+          >
             Create shift
           </Button>
         </>
       }
     >
-      <form id="create-shift-form" className="grid gap-4" onSubmit={handleSubmit}>
+      <form
+        id="create-shift-form"
+        className="grid gap-4"
+        onSubmit={handleSubmit}
+      >
         <label className="grid gap-1.5 text-sm">
-          <span className="font-medium text-foreground">Title</span>
+          <span className="text-foreground font-medium">Title</span>
           <input
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+            className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 rounded-lg border px-3 text-sm outline-none focus-visible:ring-2"
             placeholder="Opening shift, Floor coverage…"
             autoComplete="off"
           />
         </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5 text-sm">
-            <span className="font-medium text-foreground">Start</span>
-            <input
-              type="datetime-local"
-              required
-              value={startLocal}
-              onChange={(e) => setStartLocal(e.target.value)}
-              className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
-          <label className="grid gap-1.5 text-sm">
-            <span className="font-medium text-foreground">End</span>
-            <input
-              type="datetime-local"
-              required
-              value={endLocal}
-              onChange={(e) => setEndLocal(e.target.value)}
-              className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
+          <DateTimeField
+            id="start"
+            label="Start"
+            required
+            value={startLocal}
+            onChange={setStartLocal}
+          />
+          <DateTimeField
+            id="end"
+            label="End"
+            required
+            value={endLocal}
+            onChange={setEndLocal}
+          />
         </div>
 
         <label className="grid gap-1.5 text-sm">
-          <span className="font-medium text-foreground">Capacity</span>
+          <span className="text-foreground font-medium">Capacity</span>
           <input
             type="number"
             min={1}
             required
             value={maxEmployees}
             onChange={(e) => setMaxEmployees(Number(e.target.value))}
-            className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="border-input bg-background focus-visible:ring-ring h-10 rounded-lg border px-3 text-sm outline-none focus-visible:ring-2"
           />
         </label>
 
         <label className="grid gap-1.5 text-sm">
-          <span className="font-medium text-foreground">Visibility</span>
-          <select
+          <span className="text-foreground font-medium">Visibility</span>
+          <Select
             value={status}
-            onChange={(e) => setStatus(e.target.value as "draft" | "published")}
-            className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onValueChange={(value) => setStatus(value as "draft" | "published")}
           >
-            <option value="published">Published (visible to matching employees)</option>
-            <option value="draft">Draft (only you)</option>
-          </select>
+            <SelectTrigger className="h-10 rounded-lg">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="published">
+                Published (visible to matching employees)
+              </SelectItem>
+              <SelectItem value="draft">Draft (only you)</SelectItem>
+            </SelectContent>
+          </Select>
         </label>
       </form>
     </Modal>

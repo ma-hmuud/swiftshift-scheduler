@@ -5,8 +5,19 @@ import { toast } from "sonner";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { DateTimeField } from "~/components/ui/datetime-field";
 import { Modal } from "~/components/ui/modal";
-import { datetimeLocalToIso, isoToDatetimeLocalValue } from "~/lib/datetime/local-input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "~/components/ui/select";
+import {
+  datetimeLocalToIso,
+  isoToDatetimeLocalValue,
+} from "~/lib/datetime/local-input";
 import { api, type RouterOutputs } from "~/trpc/react";
 
 type ManagerShiftRow = NonNullable<
@@ -26,22 +37,24 @@ export function ManagerShiftDetailModal({
 }: ManagerShiftDetailModalProps) {
   const utils = api.useUtils();
 
-  const assignmentsQuery = api.manager.shiftRequests.listApprovedForShift.useQuery(
-    { shiftId: shift?.id ?? 0 },
-    { enabled: open && Boolean(shift?.id) },
-  );
+  const assignmentsQuery =
+    api.manager.shiftRequests.listApprovedForShift.useQuery(
+      { shiftId: shift?.id ?? 0 },
+      { enabled: open && Boolean(shift?.id) },
+    );
 
-  const removeAssignment = api.manager.shiftRequests.removeAssignment.useMutation({
-    onSuccess: async () => {
-      toast.success("Employee removed from shift");
-      await Promise.all([
-        utils.manager.shifts.list.invalidate(),
-        utils.manager.shiftRequests.listApprovedForShift.invalidate(),
-        utils.manager.shiftRequests.listAll.invalidate(),
-      ]);
-    },
-    onError: (e) => toast.error(e.message ?? "Could not remove employee"),
-  });
+  const removeAssignment =
+    api.manager.shiftRequests.removeAssignment.useMutation({
+      onSuccess: async () => {
+        toast.success("Employee removed from shift");
+        await Promise.all([
+          utils.manager.shifts.list.invalidate(),
+          utils.manager.shiftRequests.listApprovedForShift.invalidate(),
+          utils.manager.shiftRequests.listAll.invalidate(),
+        ]);
+      },
+      onError: (e) => toast.error(e.message ?? "Could not remove employee"),
+    });
 
   const [title, setTitle] = useState("");
   const [startLocal, setStartLocal] = useState("");
@@ -117,10 +130,18 @@ export function ManagerShiftDetailModal({
           >
             Delete
           </Button>
-          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => onOpenChange(false)}
+          >
             Close
           </Button>
-          <Button type="submit" form="edit-shift-form" loading={update.isPending}>
+          <Button
+            type="submit"
+            form="edit-shift-form"
+            loading={update.isPending}
+          >
             Save changes
           </Button>
         </>
@@ -139,7 +160,7 @@ export function ManagerShiftDetailModal({
           >
             {shift.status}
           </Badge>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             Manager · {shift.managerName}
           </span>
         </div>
@@ -149,29 +170,23 @@ export function ManagerShiftDetailModal({
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="border-input bg-background focus-visible:ring-ring h-10 rounded-lg border px-3 text-sm outline-none focus-visible:ring-2"
           />
         </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5 text-sm">
-            <span className="font-medium">Start</span>
-            <input
-              type="datetime-local"
-              value={startLocal}
-              onChange={(e) => setStartLocal(e.target.value)}
-              className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
-            />
-          </label>
-          <label className="grid gap-1.5 text-sm">
-            <span className="font-medium">End</span>
-            <input
-              type="datetime-local"
-              value={endLocal}
-              onChange={(e) => setEndLocal(e.target.value)}
-              className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
-            />
-          </label>
+          <DateTimeField
+            id="start"
+            label="Start"
+            value={startLocal}
+            onChange={setStartLocal}
+          />
+          <DateTimeField
+            id="end"
+            label="End"
+            value={endLocal}
+            onChange={setEndLocal}
+          />
         </div>
 
         <label className="grid gap-1.5 text-sm">
@@ -181,47 +196,60 @@ export function ManagerShiftDetailModal({
             min={1}
             value={maxEmployees}
             onChange={(e) => setMaxEmployees(Number(e.target.value))}
-            className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+            className="border-input bg-background h-10 rounded-lg border px-3 text-sm"
           />
         </label>
 
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Status</span>
-          <select
+          <Select
             value={status}
-            onChange={(e) =>
-              setStatus(e.target.value as typeof status)
-            }
-            className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+            onValueChange={(value) => setStatus(value as typeof status)}
           >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="filled">Filled</option>
-          </select>
+            <SelectTrigger className="h-10 rounded-lg">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="filled">Filled</SelectItem>
+            </SelectContent>
+          </Select>
         </label>
 
-        <div className="rounded-xl border border-border bg-muted/30 p-4">
-          <h3 className="text-sm font-semibold text-foreground">Assigned employees</h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Approved coverage for this shift. Removing someone frees a seat and removes their booking.
+        <div className="border-border bg-muted/30 rounded-xl border p-4">
+          <h3 className="text-foreground text-sm font-semibold">
+            Assigned employees
+          </h3>
+          <p className="text-muted-foreground mt-1 text-xs">
+            Approved coverage for this shift. Removing someone frees a seat and
+            removes their booking.
           </p>
           {assignmentsQuery.isLoading ? (
-            <p className="mt-3 text-sm text-muted-foreground">Loading…</p>
+            <p className="text-muted-foreground mt-3 text-sm">Loading…</p>
           ) : assignmentsQuery.isError ? (
-            <p className="mt-3 text-sm text-destructive">Could not load assignments.</p>
+            <p className="text-destructive mt-3 text-sm">
+              Could not load assignments.
+            </p>
           ) : (assignmentsQuery.data?.data?.length ?? 0) === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">No approved employees yet.</p>
+            <p className="text-muted-foreground mt-3 text-sm">
+              No approved employees yet.
+            </p>
           ) : (
-            <ul className="mt-3 divide-y divide-border rounded-lg border border-border bg-background">
+            <ul className="divide-border border-border bg-background mt-3 divide-y rounded-lg border">
               {(assignmentsQuery.data?.data ?? []).map((row) => (
                 <li
                   key={row.requestId}
                   className="flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">{row.employeeName}</p>
-                    <p className="truncate text-xs text-muted-foreground">{row.employeeEmail}</p>
+                    <p className="text-foreground truncate text-sm font-medium">
+                      {row.employeeName}
+                    </p>
+                    <p className="text-muted-foreground truncate text-xs">
+                      {row.employeeEmail}
+                    </p>
                   </div>
                   <Button
                     type="button"

@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   defaultDaysOfWeek,
   normalizeDaysOfWeek,
@@ -20,6 +21,7 @@ import {
   type WeekdayKey,
 } from "~/lib/schemas/availability";
 import { api } from "~/trpc/react";
+import { Check, Square } from "lucide-react";
 
 export function EmployeeAvailabilityForm() {
   const utils = api.useUtils();
@@ -69,6 +71,15 @@ export function EmployeeAvailabilityForm() {
     setDays((d) => ({ ...d, [key]: !d[key] }));
   };
 
+  const allSelected = WEEKDAY_KEYS.every((key) => days[key]);
+  const toggleAll = () => {
+    const newState = { ...days };
+    WEEKDAY_KEYS.forEach((key) => {
+      newState[key] = !allSelected;
+    });
+    setDays(newState);
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (existingId) {
@@ -101,8 +112,12 @@ export function EmployeeAvailabilityForm() {
           <CardTitle>Could not load availability</CardTitle>
           <CardDescription>{error.message}</CardDescription>
         </CardHeader>
-        <div className="border-t border-border/80 px-5 py-4">
-          <Button type="button" variant="secondary" onClick={() => void refetch()}>
+        <div className="border-border/80 border-t px-5 py-4">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => void refetch()}
+          >
             Retry
           </Button>
         </div>
@@ -113,12 +128,22 @@ export function EmployeeAvailabilityForm() {
   return (
     <form onSubmit={onSubmit}>
       <Card>
-        <CardHeader>
-          <CardTitle>Weekly availability</CardTitle>
-          <CardDescription>
-            Choose the days you are generally available for shifts. Your manager uses this to
-            match you with open shifts.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+          <div className="space-y-1.5">
+            <CardTitle>Weekly availability</CardTitle>
+            <CardDescription>
+              Choose the days you are generally available for shifts. Your
+              manager uses this to match you with open shifts.
+            </CardDescription>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={toggleAll}
+          >
+            {allSelected ? <Check /> : <Square />}
+          </Button>
         </CardHeader>
         <CardContent className="space-y-2">
           <fieldset className="space-y-2">
@@ -126,20 +151,18 @@ export function EmployeeAvailabilityForm() {
             {WEEKDAY_KEYS.map((key) => (
               <label
                 key={key}
-                className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-sm transition-colors hover:bg-muted/40"
+                className="border-border bg-card hover:bg-muted/40 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition-colors"
               >
-                <input
-                  type="checkbox"
-                  className="size-4 rounded border-border text-(--app-primary) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                <Checkbox
                   checked={days[key]}
-                  onChange={() => toggle(key)}
+                  onCheckedChange={() => toggle(key)}
                 />
                 <span className="font-medium">{WEEKDAY_LABELS[key]}</span>
               </label>
             ))}
           </fieldset>
         </CardContent>
-        <div className="flex flex-wrap gap-2 border-t border-border/80 px-5 py-4">
+        <div className="border-border/80 flex flex-wrap gap-2 border-t px-5 py-4">
           <Button type="submit" loading={saving} disabled={saving}>
             {existingId ? "Save changes" : "Save availability"}
           </Button>
