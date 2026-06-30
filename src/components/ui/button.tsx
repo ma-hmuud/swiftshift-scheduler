@@ -79,7 +79,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      disabled={disabled || loading}
+      disabled={disabled ?? loading}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >

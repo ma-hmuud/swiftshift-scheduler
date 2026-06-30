@@ -25,7 +25,7 @@ export function DateTimeField({
   const [open, setOpen] = React.useState(false);
 
   const date = value ? new Date(value) : undefined;
-  const time = value ? format(date as Date, "HH:mm:ss") : "00:00:00";
+  const time = value ? format(date!, "HH:mm:ss") : "00:00:00";
 
   const combine = (nextDate: Date | undefined, nextTime: string) => {
     if (!nextDate) {
@@ -34,7 +34,7 @@ export function DateTimeField({
     }
     const [h, m, s] = nextTime.split(":").map(Number);
     const combined = new Date(nextDate);
-    combined.setHours(h || 0, m || 0, s || 0);
+    combined.setHours(h ?? 0, m ?? 0, s ?? 0);
     onChange(format(combined, "yyyy-MM-dd'T'HH:mm"));
   };
 
@@ -72,7 +72,9 @@ export function DateTimeField({
           step="1"
           required={required}
           value={time}
-          onChange={(e: any) => combine(date, e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            combine(date, e.target.value)
+          }
           className="bg-background h-10 w-28 appearance-none rounded-lg [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         />
       </div>
